@@ -1,0 +1,39 @@
+version: '3.4'
+
+services:
+  jaybankclient:
+    image: jaybankclient
+    build:
+      context: ./Jaybank.Client
+      dockerfile: Dockerfile
+    ports:
+      - 4200:4200
+    depends_on:
+      - jaybanksupportapp
+
+  jaybanksupportapp:
+    image: jaybanksupportapp
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - 8000:8000
+    depends_on:
+      - database
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=database;Port=5432;Username=postgres;Password=Joyeseosa;Database=JayBankDB
+
+  database:
+    image: postgres:17
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Joyeseosa
+      POSTGRES_DB: JayBankDB
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
