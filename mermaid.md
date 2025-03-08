@@ -8,6 +8,6 @@ flowchart TD;
     FE -->|Login| BE
     FE -->|Chat Request| BE
     FE -->|Notification| BE
-    BE -->|Validate Credentials| Database["PostgreSQL"]
+    BE -->|Validate User Credentials| Database["PostgreSQL"]
     BE -->|Async Task| Queue("Celery Task Queue")
 ```
