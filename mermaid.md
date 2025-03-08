@@ -36,6 +36,7 @@ sequenceDiagram
     BE->>DB: Validate Credentials
     BE->>JWT: External Authentication
     JWT-->>BE: Get Response
+    BE->>FE: Succesful Response
     U->>FE: Initiate Chat
     FE->>BE: Send Chat Request (HTTP)
     BE->>AI: Query AI Engine
