@@ -1,9 +1,10 @@
-## Simple flowchart
+## JayBank Support App flowchart
 ``` mermaid
 flowchart TD;
-    A-->B;
-    A-->C;
-    B-->D;
-    C-->D;
-    D-->E; 
+    FE("Frontend - Angular") --> BE("Backend - FastAPI")
+    BE -->|External API Call| AI("AI Engine - OpenAI API")
+    FE -->|Chat Request| BE
+    FE -->|Notification| BE
+    BE -->|Auth Request| Database["PostgreSQL"]
+    BE -->|Async Task| Queue("Celery Task Queue")
 ```
