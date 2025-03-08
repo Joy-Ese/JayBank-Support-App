@@ -1,4 +1,4 @@
-## JayBank Support App flowchart
+## JayBank Support App flowchart Diagram
 ``` mermaid
 flowchart TD;
     FE("Frontend - Angular") --> BE("Backend - FastAPI")
@@ -16,4 +16,27 @@ flowchart TD;
     style AI fill:maroon,stroke:black,stroke-width:4px,shadow:shadow
     style JWT fill:maroon,stroke:black,stroke-width:4px,shadow:shadow
     style Queue fill:orange,stroke:black,stroke-width:4px,shadow:shadow
+```
+
+## JayBank Support App Sequence Diagram
+
+``` mermaid
+sequenceDiagram
+    participant U as User
+    participant FE as Frontend
+    participant BE as Backend
+    participant AI as AI Engine
+    participant DB as Database
+    participant Q as TaskQueue
+
+    U->>FE: Initiate Chat
+    FE->>BE: Send Chat Request (HTTP)
+    BE->>AI: Query AI Engine
+    AI-->>BE: Get Response
+    BE->>FE: Return Response
+    FE-->>U: Display Chat Response
+
+    FE->>BE: Request Notification
+    BE->>DB: Store Notification Request
+    BE->>Q: Queue Task for Notification
 ```
