@@ -26,16 +26,17 @@ sequenceDiagram
     participant FE as Frontend
     participant BE as Backend
     participant DB as Database
-    participant AI as AI Engine
     participant JWT as Google OAuth
+    participant AI as AI Engine
     participant Q as TaskQueue
 
     U->>FE: Registration Successful
     U->>FE: Attempt Login
     FE->>BE: Send User Credentials (HTTP)
+    BE->>DB: Validate Credentials
+    BE->>JWT: External Authentication
     U->>FE: Initiate Chat
     FE->>BE: Send Chat Request (HTTP)
-    BE->>JWT: External AUthentication
     BE->>AI: Query AI Engine
     AI-->>BE: Get Response
     BE->>FE: Return Response
