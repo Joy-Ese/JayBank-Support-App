@@ -15,5 +15,5 @@ flowchart TD;
     style BE fill:red,stroke:black,stroke-width:4px,shadow:shadow
     style AI fill:maroon,stroke:black,stroke-width:4px,shadow:shadow
     style JWT fill:maroon,stroke:black,stroke-width:4px,shadow:shadow
-    style Queue fill:🟡,stroke:black,stroke-width:4px,shadow:shadow
+    style Queue fill:yellow,stroke:black,stroke-width:4px,shadow:shadow
 ```
