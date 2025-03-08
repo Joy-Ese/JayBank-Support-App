@@ -32,9 +32,9 @@ sequenceDiagram
 
     U->>FE: Registration Successful
     U->>FE: Attempt Login
+    FE->>BE: Send User Credentials (HTTP)
     U->>FE: Initiate Chat
     FE->>BE: Send Chat Request (HTTP)
-    FE->>BE: Send User Credentials (HTTP)
     BE->>JWT: External AUthentication
     BE->>AI: Query AI Engine
     AI-->>BE: Get Response
