@@ -1,0 +1,15 @@
+fastapi
+uvicorn[standard]
+requests
+pillow
+pydantic
+pydantic_extra_types
+jinja2
+python-multipart
+sqlalchemy
+alembic
+psycopg2
+jwt
+celery
+redis
+openai
