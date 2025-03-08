@@ -1,8 +1,6 @@
 ## JayBank Support App flowchart
 ``` mermaid
 flowchart TD;
-    id1[(Database)]
-    
     FE("Frontend - Angular") --> BE("Backend - FastAPI")
     BE -->|External API Call| AI("AI Engine - OpenAI API")
     BE -->|External API Authentication| JWT("Google OAuth")
@@ -12,5 +10,5 @@ flowchart TD;
     BE -->|Validate User Credentials| Database[(PostgreSQL)]
     BE -->|Async Task| Queue("Celery Task Queue")
 
-    style id1 fill:#66f,stroke:#f6f,stroke-width:4px
+    style Database fill:#66f,stroke:#f6f,stroke-width:4px
 ```
