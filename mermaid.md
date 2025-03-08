@@ -25,9 +25,9 @@ sequenceDiagram
     participant U as User
     participant FE as Frontend
     participant BE as Backend
+    participant DB as Database
     participant AI as AI Engine
     participant JWT as Google OAuth
-    participant DB as Database
     participant Q as TaskQueue
 
     U->>FE: Registration Successful
