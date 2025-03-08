@@ -13,4 +13,6 @@ flowchart TD;
     style Database fill:#66f,stroke:#f6f,stroke-width:4px
     style FE fill:blue,stroke:black,stroke-width:4px,shadow:shadow
     style BE fill:red,stroke:black,stroke-width:4px,shadow:shadow
+    style AI fill:maroon,stroke:black,stroke-width:4px,shadow:shadow
+    style JWT fill:maroon,stroke:black,stroke-width:4px,shadow:shadow
 ```
