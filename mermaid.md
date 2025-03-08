@@ -6,6 +6,6 @@ flowchart TD;
     FE -->|Register Login| BE
     FE -->|Chat Request| BE
     FE -->|Notification| BE
-    BE -->|Auth Request| Database["PostgreSQL"]
+    BE -->|Auth Request| Database["PostgreSQL"] & Jwt["OAuth"]
     BE -->|Async Task| Queue("Celery Task Queue")
 ```
