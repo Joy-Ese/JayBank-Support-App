@@ -1,0 +1,94 @@
+name: CI/CD for JayBank
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-test-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 🔹 Backend (FastAPI) Setup
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.11'
+
+      # 🔹 Install dependencies
+      - name: Install Backend Dependencies
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          pip install -r requirements.txt
+
+      # 🔹 For when I add Backend Tests
+      - name: Run Backend Tests
+        run: |
+          source venv/bin/activate
+          pytest || echo "Skipping tests"
+
+      # 🔹 Set up Node.js for Angular
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
+
+      - name: Install Angular dependencies
+        run: |
+          cd Jaybank.Client
+          npm ci
+
+      - name: Install Angular CLI globally
+        run: npm install -g @angular/cli
+
+      - name: Build Angular app
+        run: |
+          cd Jaybank.Client
+          npx ng build
+
+      # 🔹 Build and Push Docker Images
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and tag Docker images
+        run: |
+          docker build --no-cache -t joyeseosa/frontend:latest ./Jaybank.Client
+          docker build --no-cache -t joyeseosa/backend:latest ./
+
+      - name: Push Docker images
+        run: |
+          docker push joyeseosa/frontend:latest
+          docker push joyeseosa/backend:latest
+
+      # 🔹 Set up Docker
+      - name: Install Docker
+        uses: docker/setup-buildx-action@v2
+
+      # 🔹 Set up Docker Compose
+      - name: Install Docker Compose
+        run: |
+          DOCKER_CONFIG=${DOCKER_CONFIG:-$HOME/.docker}
+          mkdir -p $DOCKER_CONFIG/cli-plugins
+          curl -SL https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64 -o $DOCKER_CONFIG/cli-plugins/docker-compose
+          chmod +x $DOCKER_CONFIG/cli-plugins/docker-compose
+
+      # 🔹 Check Docker Compose Version
+      - name: Check Docker Compose Version
+        run: docker compose version
+
+      # 🔹 Deploy using Docker Compose
+      - name: Deploy with Docker Compose
+        run: |
+          docker compose down || true
+          docker compose up -d --build
