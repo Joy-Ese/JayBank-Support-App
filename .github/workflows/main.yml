@@ -63,8 +63,8 @@ jobs:
 
       - name: Build and tag Docker images
         run: |
-          docker build --no-cache -t joyeseosa/frontend:latest ./frontend
-          docker build --no-cache -t joyeseosa/backend:latest ./backend
+          docker build --no-cache -t joyeseosa/frontend:latest ./Jaybank.Client
+          docker build --no-cache -t joyeseosa/backend:latest ./
 
       - name: Push Docker images
         run: |
