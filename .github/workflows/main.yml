@@ -49,12 +49,6 @@ jobs:
       - name: Install Angular CLI globally
         run: npm install -g @angular/cli
 
-      # 🔹 For when I add Frontend Tests
-      - name: Run Frontend Tests
-        run: |
-          cd Jaybank.Client
-          npm test || echo "Skipping tests"
-
       - name: Build Angular app
         run: |
           cd Jaybank.Client
