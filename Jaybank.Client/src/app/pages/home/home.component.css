@@ -1,0 +1,38 @@
+.card-deck .card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: none;
+  margin-bottom: 20px;
+}
+
+.card-deck .card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 10px 20px rgba(0,102,204,0.2);
+}
+
+.card-deck .card-body {
+  text-align: center;
+  padding: 25px;
+}
+
+.card-deck .card-title {
+  color: #0066CC;
+  margin-bottom: 15px;
+  font-weight: bold;
+}
+
+.btn-primary {
+  background-color: #0066CC;
+  border: none;
+  padding: 12px 24px;
+  transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+  background-color: #003366;
+}
+
+@media (max-width: 768px) {
+  .card-deck .card {
+    margin-bottom: 15px;
+  }
+}

@@ -1,1 +1,28 @@
 /* You can add global styles to this file, and also import other style files */
+:root {
+  --primary-color: #0066CC;
+  --secondary-color: #003366;
+  --text-color: #333;
+  --background-color: #f4f4f4;
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+.btn-primary {
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+}
+
+.card {
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}

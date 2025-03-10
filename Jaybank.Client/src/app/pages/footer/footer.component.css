@@ -1,0 +1,102 @@
+.footer {
+  background-color: #003366;
+  color: white;
+  padding: 40px 0;
+  margin-top: 60px;
+}
+
+.footer h5 {
+  margin-bottom: 20px;
+  font-weight: 600;
+  color: white;
+}
+
+.footer p {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+}
+
+.footer ul li {
+  margin-bottom: 10px;
+}
+
+.footer ul li a {
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.footer ul li a:hover {
+  color: white;
+  text-decoration: none;
+}
+
+.social-icons {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.social-icons .icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+}
+
+.social-icons .icon:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.newsletter p {
+  margin-bottom: 10px;
+}
+
+.newsletter .input-group {
+  display: flex;
+}
+
+.newsletter .form-control {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: white;
+}
+
+.newsletter .form-control::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.newsletter .form-control:focus {
+  background-color: rgba(255, 255, 255, 0.15);
+  box-shadow: none;
+}
+
+.newsletter .btn {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  background-color: #0066CC;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+.newsletter .btn:hover {
+  background-color: #005bb8;
+}
+
+@media (max-width: 767px) {
+  .footer {
+    text-align: center;
+  }
+  
+  .social-icons {
+    justify-content: center;
+  }
+}
