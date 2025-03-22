@@ -15,3 +15,4 @@ redis
 openai
 passlib[bcrypt]
 python-jose[cryptography]
+sqlalchemy-utils
