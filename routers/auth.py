@@ -3,6 +3,7 @@ from datetime import datetime
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
 from database import get_db
+from encryption import encrypt_data, decrypt_data
 import models
 import schemas
 from dependencies import hash_password, verify_password
@@ -11,7 +12,14 @@ from jwt import create_access_token
 router = APIRouter()
 
 @router.post("/register", response_model=schemas.ResponseModel)
-def register(user: schemas.CreateUser, db: Session = Depends(get_db)):
+def register(encrypted_request: dict, db: Session = Depends(get_db)):
+  try:
+    # Decrypt request data
+    decrypted_data = decrypt_data(encrypted_request["data"])
+    user = schemas.CreateUser.parse_raw(decrypted_data)
+  except Exception as e:
+    raise HTTPException(status_code=400, detail="Invalid encryption format")
+
   # checking if user exists
   existing_user = db.query(models.User).filter(
     or_(models.User.email == user.email, models.User.username == user.username)
@@ -42,10 +50,21 @@ def register(user: schemas.CreateUser, db: Session = Depends(get_db)):
   db.add(new_user)
   db.commit()
   db.refresh(new_user)
-  return {"status": True, "message": "Registration successful"}
+
+  # Encrypt response
+  encrypted_response = encrypt_data('{"status": true, "message": "Registration successful"}')
+
+  return {"data": encrypted_response}
 
 @router.post("/login")
-def login(user: schemas.UserLogin, db: Session = Depends(get_db)):
+def register(encrypted_request: dict, db: Session = Depends(get_db)):
+  try:
+    # Decrypt request data
+    decrypted_data = decrypt_data(encrypted_request["data"])
+    user = schemas.UserLogin.parse_raw(decrypted_data)
+  except Exception as e:
+    raise HTTPException(status_code=400, detail="Invalid encryption format")
+
   db_user = db.query(models.User).filter(models.User.username == user.username).first()
   if not db_user or not verify_password(user.password, db_user.hashed_password):
     raise HTTPException(status_code=400, detail="Invalid credentials")
@@ -55,4 +74,8 @@ def login(user: schemas.UserLogin, db: Session = Depends(get_db)):
   db.refresh(db_user)
 
   token = create_access_token({"username": db_user.username})
-  return {"access_token": token, "token_type": "bearer"}
+
+  # Encrypt response
+  encrypted_response = encrypt_data('{"access_token": "' + token + '", "token_type": "bearer"}')
+
+  return {"data": encrypted_response}
