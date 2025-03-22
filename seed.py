@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from models import Credit
+import models
 
 def seed_credits(db: Session):
   """Check if the Credits table is empty and seed default plans."""
@@ -27,9 +27,9 @@ def seed_credits(db: Session):
   ]
 
   # Check if table is already populated
-  if not db.query(credits).first():
+  if not db.query(models.Credit).first():
     for plan in default_plans:
-      db.add(credits(**plan))
+      db.add(models.Credit(**plan))
     db.commit()
     print("✅ Default credit plans seeded.")
   else:

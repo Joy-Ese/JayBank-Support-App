@@ -15,8 +15,7 @@ class UserLogin(BaseModel):
   username: str
   password: str
 
-class CreateUserResponse(BaseModel):
-  id: int
+class GetUserResp(BaseModel):
   first_name: str
   last_name: str
   username: str
