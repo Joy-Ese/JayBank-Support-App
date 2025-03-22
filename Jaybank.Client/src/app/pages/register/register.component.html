@@ -2,33 +2,116 @@
   <div class="row justify-content-center">
     <div class="col-md-6">
       <div class="card">
-        <div class="card-header text-center" style="background-color: #0066CC; color: white;">
+        <div class="card-header text-center" style="background-color: #DB7093; color: white;">
           <h3>Register for JB AI Support</h3>
         </div>
         <div class="card-body">
-          <form>
+          <small *ngIf="status == false" class="alert alert-danger">{{respMsg}}</small>
+
+          <form class="mt-4" [formGroup]="registerForm" (ngSubmit)="onSubmit(registerForm.value)">
             <div class="mb-3">
-              <label for="firstName" class="form-label">First Name</label>
+              <label for="first_name" class="form-label">First Name</label>
               <input 
-                type="text" class="form-control" id="firstName" required>
+                type="text"
+                class="form-control form-control-sm" 
+                id="first_name" 
+                formControlName="first_name"
+                [class.is-invalid]="registerForm.get('first_name')?.invalid && registerForm.get('first_name')?.touched"
+              >
+              <div class="invalid-feedback" *ngIf="registerForm.get('first_name')?.errors?.['required'] && registerForm.get('first_name')?.touched">
+                First Name is required
+              </div>
+              <div class="invalid-feedback" *ngIf="registerForm.get('first_name')?.errors?.['minlength'] && registerForm.get('first_name')?.touched">
+                First Name must be at least 2 characters
+              </div>
             </div>
+
             <div class="mb-3">
-              <label for="lastName" class="form-label">Last Name</label>
-              <input type="text" class="form-control" id="lastName" required>
+              <label for="last_name" class="form-label">Last Name</label>
+              <input 
+                type="text"
+                class="form-control form-control-sm" 
+                id="last_name" 
+                formControlName="last_name"
+                [class.is-invalid]="registerForm.get('last_name')?.invalid && registerForm.get('last_name')?.touched"
+              >
+              <div class="invalid-feedback" *ngIf="registerForm.get('last_name')?.errors?.['required'] && registerForm.get('last_name')?.touched">
+                Last Name is required
+              </div>
+              <div class="invalid-feedback" *ngIf="registerForm.get('last_name')?.errors?.['minlength'] && registerForm.get('last_name')?.touched">
+                Last Name must be at least 2 characters
+              </div>
             </div>
+
             <div class="mb-3">
-              <label for="email" class="form-label">Email Address</label>
-              <input type="email" class="form-control" id="email" required>
+              <label for="username" class="form-label">Username</label>
+              <input 
+                type="text"
+                class="form-control form-control-sm" 
+                id="username" 
+                formControlName="username"
+                [class.is-invalid]="registerForm.get('username')?.invalid && registerForm.get('username')?.touched"
+              >
+              <div class="invalid-feedback" *ngIf="registerForm.get('username')?.errors?.['required'] && registerForm.get('username')?.touched">
+                Username is required
+              </div>
+              <div class="invalid-feedback" *ngIf="registerForm.get('username')?.errors?.['minlength'] && registerForm.get('username')?.touched">
+                Username must be at least 2 characters
+              </div>
             </div>
+
             <div class="mb-3">
-              <label for="password" class="form-label">Password</label>
-              <input type="password" class="form-control" id="password" required>
+              <label for="reg-email" class="form-label">Email Address</label>
+              <input 
+                type="email" 
+                class="form-control form-control-sm" 
+                id="reg-email" 
+                formControlName="email"
+                [class.is-invalid]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched"
+              >
+              <div class="invalid-feedback" *ngIf="registerForm.get('email')?.errors?.['required'] && registerForm.get('email')?.touched">
+                Email is required
+              </div>
+              <div class="invalid-feedback" *ngIf="registerForm.get('email')?.errors?.['email'] && registerForm.get('email')?.touched">
+                Please enter a valid email
+              </div>
             </div>
+
+            <div class="mb-3">
+              <label for="reg-password" class="form-label">Password</label>
+              <input 
+                type="password" 
+                class="form-control form-control-sm" 
+                id="reg-password" 
+                formControlName="password"
+                [class.is-invalid]="registerForm.get('password')?.invalid && registerForm.get('password')?.touched"
+              >
+              <div class="invalid-feedback" *ngIf="registerForm.get('password')?.errors?.['required'] && registerForm.get('password')?.touched">
+                Password is required
+              </div>
+              <div class="invalid-feedback" *ngIf="registerForm.get('password')?.errors?.['minlength'] && registerForm.get('password')?.touched">
+                Password must be at least 6 characters
+              </div>
+            </div>
+
             <div class="mb-3">
               <label for="confirmPassword" class="form-label">Confirm Password</label>
-              <input type="password" class="form-control" id="confirmPassword" required>
+              <input 
+                type="password" 
+                class="form-control form-control-sm" 
+                id="confirmPassword" 
+                formControlName="confirmPassword"
+                [class.is-invalid]="registerForm.get('confirmPassword')?.invalid && registerForm.get('confirmPassword')?.touched"
+              >
+              <div class="invalid-feedback" *ngIf="registerForm.get('confirmPassword')?.errors?.['required'] && registerForm.get('confirmPassword')?.touched">
+                Please confirm your password
+              </div>
+              <div class="invalid-feedback" *ngIf="registerForm.get('confirmPassword')?.errors?.['passwordMismatch'] && registerForm.get('confirmPassword')?.touched">
+                Passwords do not match
+              </div>
             </div>
-            <button type="submit" class="btn btn-primary w-100" style="background-color: #0066CC;">Create Account</button>
+
+            <button type="submit" class="btn btn-primary w-100" style="background-color: #DB7093;">Create Account</button>
           </form>
         </div>
       </div>

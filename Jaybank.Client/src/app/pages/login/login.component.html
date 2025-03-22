@@ -2,20 +2,48 @@
   <div class="row justify-content-center">
     <div class="col-md-6">
       <div class="card">
-        <div class="card-header text-center" style="background-color: #0066CC; color: white;">
+        <div class="card-header text-center" style="background-color: #DB7093; color: white;">
           <h3>Login to JB AI Support</h3>
         </div>
         <div class="card-body">
-          <form>
+          <small *ngIf="status == false" class="alert alert-danger">{{respMsg}}</small>
+
+          <form class="mt-4" [formGroup]="loginForm" (ngSubmit)="onSubmit(loginForm.value)">
             <div class="mb-3">
-              <label for="loginEmail" class="form-label">Email Address</label>
-              <input type="email" class="form-control" id="loginEmail" required>
+              <label for="username" class="form-label">Username</label>
+              <input 
+                type="text"
+                class="form-control form-control-sm" 
+                id="username" 
+                formControlName="username"
+                [class.is-invalid]="loginForm.get('username')?.invalid && loginForm.get('username')?.touched"
+              >
+              <div class="invalid-feedback" *ngIf="loginForm.get('username')?.errors?.['required'] && loginForm.get('username')?.touched">
+                Username is required
+              </div>
+              <div class="invalid-feedback" *ngIf="loginForm.get('username')?.errors?.['minlength'] && loginForm.get('username')?.touched">
+                Username must be at least 2 characters
+              </div>
             </div>
+
             <div class="mb-3">
-              <label for="loginPassword" class="form-label">Password</label>
-              <input type="password" class="form-control" id="loginPassword" required>
+              <label for="password" class="form-label">Password</label>
+              <input 
+                type="password" 
+                class="form-control form-control-sm" 
+                id="password" 
+                formControlName="password"
+                [class.is-invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+              >
+              <div class="invalid-feedback" *ngIf="loginForm.get('password')?.errors?.['required'] && loginForm.get('password')?.touched">
+                Password is required
+              </div>
+              <div class="invalid-feedback" *ngIf="loginForm.get('password')?.errors?.['minlength'] && loginForm.get('password')?.touched">
+                Password must be at least 6 characters
+              </div>
             </div>
-            <button type="submit" class="btn btn-primary w-100" style="background-color: #0066CC;">Login</button>
+
+            <button type="submit" class="btn btn-primary w-100" style="background-color: #DB7093;">Login</button>
           </form>
           <div class="text-center mt-3">
             <a href="#" class="text-decoration-none">Forgot Password?</a>

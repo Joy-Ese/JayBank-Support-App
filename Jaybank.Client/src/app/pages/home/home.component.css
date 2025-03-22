@@ -15,13 +15,13 @@
 }
 
 .card-deck .card-title {
-  color: #0066CC;
+  color: #DB7093;
   margin-bottom: 15px;
   font-weight: bold;
 }
 
 .btn-primary {
-  background-color: #0066CC;
+  background-color: #DB7093;
   border: none;
   padding: 12px 24px;
   transition: background-color 0.3s ease;
