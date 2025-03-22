@@ -13,3 +13,5 @@ jwt
 celery
 redis
 openai
+passlib[bcrypt]
+python-jose[cryptography]
