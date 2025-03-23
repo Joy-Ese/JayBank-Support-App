@@ -16,3 +16,4 @@ openai
 passlib[bcrypt]
 python-jose[cryptography]
 sqlalchemy-utils
+pycryptodome

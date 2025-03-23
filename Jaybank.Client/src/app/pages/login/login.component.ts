@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { EncryptionService } from '../../services/encryption.service';
 
 @Component({
   selector: 'app-login',
@@ -20,13 +21,12 @@ export class LoginComponent implements OnInit{
 
   status! : boolean;
 
-  key : any;
-
   loginForm: FormGroup;
 
   constructor(
     private http: HttpClient,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private encryptionService : EncryptionService
   ) {
     this.loginForm = this.fb.group({
       username: ["", [Validators.required, Validators.minLength(2)]],
@@ -39,29 +39,20 @@ export class LoginComponent implements OnInit{
   onSubmit(loginData: { userName: string, password: string }) {
     console.log("Login form submitted");
 
+    const encryptedData = this.encryptionService.encrypt(loginData);
+
     const headers = new HttpHeaders({
       "Content-Type": "application/json"
     });
 
-    this.http.post<any>(`${this.baseUrl}/auth/login`, loginData, {headers: headers})
+    this.http.post<any>(`${this.baseUrl}/auth/login`, { encrypted_data: encryptedData }, {headers: headers})
     .subscribe({
       next: (res) => {
-        console.log(res);
-
-        localStorage.setItem("login resp", JSON.stringify(res));
-        localStorage.setItem("token", res.access_token);
-        
-
-
-        // const decryptedResponse = this.encryptionService.decryptData(res);
-        // console.log('Decrypted Response:', decryptedResponse);
-        // if (!decryptedResponse.status) {
-        //   this.status = decryptedResponse.status;
-        //   this.respMsg = decryptedResponse.message;
-        // }
-        // this.key = localStorage.setItem("loginResp", JSON.stringify(decryptedResponse));
-        // console.log(decryptedResponse.message);
-        // localStorage.setItem("token", decryptedResponse.message);
+        const decryptedResponse = this.encryptionService.decrypt(res.data);
+        console.log(decryptedResponse);
+        let decryptedResponseObject = JSON.parse(decryptedResponse);
+        console.log(decryptedResponseObject.access_token);
+        localStorage.setItem("token", decryptedResponseObject.access_token);
 
 
         // const headers2 = new HttpHeaders({
