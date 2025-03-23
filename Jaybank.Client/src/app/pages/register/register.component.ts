@@ -1,6 +1,6 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, DOCUMENT } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { EncryptionService } from '../../services/encryption.service';
 
@@ -24,6 +24,7 @@ export class RegisterComponent {
   registerForm: FormGroup;
 
   constructor(
+    @Inject(DOCUMENT) private domDocument: Document,
     private http: HttpClient,
     private fb: FormBuilder,
     private encryptionService : EncryptionService
@@ -54,23 +55,24 @@ export class RegisterComponent {
   onSubmit(registerData: [key: string]) {
     console.log("Register form submitted");
 
+    const encryptedData = this.encryptionService.encrypt(registerData);
+
     const headers = new HttpHeaders({
       "Content-Type": "application/json"
     });
 
-    this.http.post<any>(`${this.baseUrl}/auth/register`, registerData, {headers: headers})
+    this.http.post<any>(`${this.baseUrl}/auth/register`, { encrypted_data: encryptedData }, {headers: headers})
     .subscribe({
-      next: (res) => {
-        console.log(res);
-        // const decryptedResponse = this.encryptionService.decryptData(res);
-        // console.log('Decrypted Response:', decryptedResponse);
-        // if (!decryptedResponse.status) {
-        //   this.status = decryptedResponse.status;
-        //   this.respMsg = decryptedResponse.message;
-        // }
-        // console.log(decryptedResponse.message);
+      next: (res: any) => {
+        const decryptedResponse = this.encryptionService.decrypt(res.data);
+        console.log(decryptedResponse);
+        let decryptedResponseObject = JSON.parse(decryptedResponse);
+        if (!decryptedResponseObject.status) {
+          this.status = decryptedResponseObject.status;
+          this.respMsg = decryptedResponseObject.message;
+        }
         if (this.status == true) {
-          // setTimeout(() => {this.router.navigate(['/login'])}, 4000);
+          setTimeout(() => {this.domDocument.location.replace("/login")}, 4000);
         }
       },
       error: (err) => {

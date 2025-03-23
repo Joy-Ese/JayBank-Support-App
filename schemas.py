@@ -1,8 +1,11 @@
 from pydantic import BaseModel, EmailStr
 
-class ResponseModel(BaseModel):
-  status: bool
-  message: str
+class EncryptedRequest(BaseModel):
+  encrypted_data: str
+
+# class ResponseModel(BaseModel):
+#   status: bool
+#   message: str
 
 class CreateUser(BaseModel):
   first_name: str

@@ -1,3 +1,4 @@
+import json
 from fastapi import APIRouter, Depends, HTTPException
 from datetime import datetime
 from sqlalchemy.orm import Session
@@ -11,14 +12,19 @@ from jwt import create_access_token
 
 router = APIRouter()
 
-@router.post("/register", response_model=schemas.ResponseModel)
-def register(encrypted_request: dict, db: Session = Depends(get_db)):
+@router.post("/register")
+def register(encrypted_request: schemas.EncryptedRequest, db: Session = Depends(get_db)):
   try:
     # Decrypt request data
-    decrypted_data = decrypt_data(encrypted_request["data"])
-    user = schemas.CreateUser.parse_raw(decrypted_data)
+    decrypted_data = decrypt_data(encrypted_request.encrypted_data)
+
+    if not decrypted_data:
+      raise HTTPException(status_code=400, detail="Invalid encryption format")
+
+    decrypted_data_str = json.dumps(decrypted_data)
+    user = schemas.CreateUser.parse_raw(decrypted_data_str)
   except Exception as e:
-    raise HTTPException(status_code=400, detail="Invalid encryption format")
+    raise HTTPException(status_code=400, detail=f"Invalid encryption format: {str(e)}")
 
   # checking if user exists
   existing_user = db.query(models.User).filter(
@@ -51,19 +57,22 @@ def register(encrypted_request: dict, db: Session = Depends(get_db)):
   db.commit()
   db.refresh(new_user)
 
-  # Encrypt response
-  encrypted_response = encrypt_data('{"status": true, "message": "Registration successful"}')
-
+  encrypted_response = encrypt_data(json.dumps({"status": True, "message": "Registration successful"}))
   return {"data": encrypted_response}
 
 @router.post("/login")
-def register(encrypted_request: dict, db: Session = Depends(get_db)):
+def login(encrypted_request: schemas.EncryptedRequest, db: Session = Depends(get_db)):
   try:
     # Decrypt request data
-    decrypted_data = decrypt_data(encrypted_request["data"])
-    user = schemas.UserLogin.parse_raw(decrypted_data)
+    decrypted_data = decrypt_data(encrypted_request.encrypted_data)
+
+    if not decrypted_data:
+      raise HTTPException(status_code=400, detail="Invalid encryption format")
+
+    decrypted_data_str = json.dumps(decrypted_data)
+    user = schemas.UserLogin.parse_raw(decrypted_data_str)
   except Exception as e:
-    raise HTTPException(status_code=400, detail="Invalid encryption format")
+    raise HTTPException(status_code=400, detail=f"Invalid encryption format: {str(e)}")
 
   db_user = db.query(models.User).filter(models.User.username == user.username).first()
   if not db_user or not verify_password(user.password, db_user.hashed_password):
@@ -75,7 +84,6 @@ def register(encrypted_request: dict, db: Session = Depends(get_db)):
 
   token = create_access_token({"username": db_user.username})
 
-  # Encrypt response
-  encrypted_response = encrypt_data('{"access_token": "' + token + '", "token_type": "bearer"}')
-
+  encrypted_response = encrypt_data(json.dumps({"access_token": token, "token_type": "bearer"}))
   return {"data": encrypted_response}
+
