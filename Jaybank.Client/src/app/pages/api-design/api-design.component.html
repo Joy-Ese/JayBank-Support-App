@@ -1,5 +1,55 @@
-<div class="container mt-3">
-  <div class="row">
-    API Design
-  </div>
+<div class="api-design-container mt-3">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>AI Customer Support API Design</mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+        <!-- Method Column -->
+        <ng-container matColumnDef="method">
+          <mat-header-cell *matHeaderCellDef>Method</mat-header-cell>
+          <mat-cell *matCellDef="let element">
+            <mat-chip [color]="getMethodColor(element.method)">
+              {{ element.method }}
+            </mat-chip>
+          </mat-cell>
+        </ng-container>
+
+        <!-- Path Column -->
+        <ng-container matColumnDef="path">
+          <mat-header-cell *matHeaderCellDef>Path</mat-header-cell>
+          <mat-cell *matCellDef="let element">{{ element.path }}</mat-cell>
+        </ng-container>
+
+        <!-- Description Column -->
+        <ng-container matColumnDef="description">
+          <mat-header-cell *matHeaderCellDef>Description</mat-header-cell>
+          <mat-cell *matCellDef="let element">{{ element.description }}</mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+      </mat-table>
+
+      <mat-expansion-panel *ngFor="let endpoint of apiEndpoints" class="endpoint-panel">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            {{ endpoint.path }}
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        
+        <div class="endpoint-details">
+          <div class="request-body">
+            <h3>Request Body</h3>
+            <pre>{{ endpoint.requestBody | json }}</pre>
+          </div>
+          <div class="response-body">
+            <h3>Response Body</h3>
+            <pre>{{ endpoint.responseBody | json }}</pre>
+          </div>
+        </div>
+      </mat-expansion-panel>
+    </mat-card-content>
+  </mat-card>
 </div>

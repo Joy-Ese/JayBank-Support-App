@@ -1,5 +1,65 @@
-<div class="container mt-3">
-  <div class="row">
-    Dashboard
-  </div>
+<div class="dashboard-container mt-3">
+  <mat-card class="dashboard-card">
+    <mat-card-header>
+      <mat-card-title>Admin Dashboard</mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <div class="row">
+        <div class="col-md-6">
+          <mat-card>
+            <mat-card-header>
+              <mat-card-title>User Statistics</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <canvas id="userChart"></canvas>
+            </mat-card-content>
+          </mat-card>
+        </div>
+        
+        <div class="col-md-6">
+          <mat-card>
+            <mat-card-header>
+              <mat-card-title>Credit Distribution</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <canvas id="creditChart"></canvas>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </div>
+
+      <mat-card class="mt-4">
+        <mat-card-header>
+          <mat-card-title>User Details</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+            <!-- Metric Column -->
+            <ng-container matColumnDef="metric">
+              <mat-header-cell *matHeaderCellDef> Metric </mat-header-cell>
+              <mat-cell *matCellDef="let element"> {{element.metric}} </mat-cell>
+            </ng-container>
+
+            <!-- Count Column -->
+            <ng-container matColumnDef="count">
+              <mat-header-cell *matHeaderCellDef> Count </mat-header-cell>
+              <mat-cell *matCellDef="let element"> {{element.count}} </mat-cell>
+            </ng-container>
+
+            <!-- Percentage Column -->
+            <ng-container matColumnDef="percentage">
+              <mat-header-cell *matHeaderCellDef> Percentage </mat-header-cell>
+              <mat-cell *matCellDef="let element"> {{element.percentage | number:'1.2-2'}}% </mat-cell>
+            </ng-container>
+
+            <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+            <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+          </mat-table>
+
+          <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+        </mat-card-content>
+      </mat-card>
+    </mat-card-content>
+  </mat-card>
 </div>

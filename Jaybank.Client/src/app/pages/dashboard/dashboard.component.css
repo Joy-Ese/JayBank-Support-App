@@ -1,0 +1,35 @@
+.dashboard-container {
+  padding: 20px;
+  background-color: #f4f6f9;
+}
+
+.dashboard-card {
+  width: 100%;
+}
+
+.mat-card-header {
+  background-color: #DB7093;
+  color: white;
+  padding: 15px;
+}
+
+.mat-card-title {
+  color: white !important;
+}
+
+.mat-table {
+  width: 100%;
+}
+
+.mat-header-cell {
+  font-weight: bold;
+  color: #DB7093;
+}
+
+.mat-row:nth-child(even) {
+  background-color: rgba(0, 102, 204, 0.05);
+}
+
+.mat-row:nth-child(odd) {
+  background-color: rgba(0, 51, 102, 0.05);
+}

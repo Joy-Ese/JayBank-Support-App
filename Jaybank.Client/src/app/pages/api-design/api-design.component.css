@@ -1,0 +1,38 @@
+.api-design-container {
+  padding: 20px;
+}
+
+.mat-table {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.endpoint-panel {
+  margin-bottom: 10px;
+}
+
+.endpoint-details {
+  display: flex;
+  justify-content: space-between;
+}
+
+.request-body, .response-body {
+  width: 48%;
+}
+
+pre {
+  background-color: #f4f4f4;
+  padding: 10px;
+  border-radius: 5px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.mat-mdc-card-header {
+  background-color: #DB7093;
+  color: white;
+}
+
+.mat-mdc-card-title {
+  color: white !important;
+}
