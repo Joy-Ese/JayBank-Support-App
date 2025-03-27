@@ -1,4 +1,5 @@
-import { AfterViewInit, Component, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, Inject, PLATFORM_ID, ViewChild } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { Chart } from 'chart.js/auto';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
@@ -40,12 +41,15 @@ export class DashboardComponent implements AfterViewInit  {
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-  constructor() {}
+  constructor(@Inject(PLATFORM_ID) private platformId: object) {}
 
   ngAfterViewInit(): void {
     this.initializeTableData();
-    this.createUserChart();
-    this.createCreditChart();
+
+    if (isPlatformBrowser(this.platformId)) { 
+      this.createUserChart();
+      this.createCreditChart();
+    }
   }
 
   initializeTableData() {
