@@ -1,5 +1,4 @@
-import { AfterViewInit, Component, Inject, PLATFORM_ID, ViewChild } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { AfterViewInit, Component, ViewChild } from '@angular/core';
 import { Chart } from 'chart.js/auto';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
@@ -41,12 +40,12 @@ export class DashboardComponent implements AfterViewInit  {
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-  constructor(@Inject(PLATFORM_ID) private platformId: object) {}
+  constructor() {}
 
   ngAfterViewInit(): void {
     this.initializeTableData();
-    this.createUserChart();
-    this.createCreditChart();
+    // this.createUserChart();
+    // this.createCreditChart();
   }
 
   initializeTableData() {
@@ -77,57 +76,51 @@ export class DashboardComponent implements AfterViewInit  {
     this.dataSource.paginator = this.paginator;
   }
 
-  createUserChart() {
-    if (isPlatformBrowser(this.platformId)) {
-      const ctx = document.getElementById('userChart') as HTMLCanvasElement;
-      this.userChart = new Chart(ctx, {
-        type: 'pie',
-        data: {
-          labels: ['Total Users', 'Purchased Credit Users', 'Low Credit Users', 'Active Chats'],
-          datasets: [{
-            data: [this.totalUsers, this.purchasedCreditUsers, this.lowCreditUsers, this.activeChats],
-            backgroundColor: ['#DB7093', '#003366', '#6699CC', '#336699']
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            title: {
-              display: true,
-              text: 'User Statistics'
-            }
-          }
-        }
-      });
-    }
-    
-  }
+  // createUserChart() {
+  //   const ctx = document.getElementById('userChart') as HTMLCanvasElement;
+  //   this.userChart = new Chart(ctx, {
+  //     type: 'pie',
+  //     data: {
+  //       labels: ['Total Users', 'Purchased Credit Users', 'Low Credit Users', 'Active Chats'],
+  //       datasets: [{
+  //         data: [this.totalUsers, this.purchasedCreditUsers, this.lowCreditUsers, this.activeChats],
+  //         backgroundColor: ['#DB7093', '#003366', '#6699CC', '#336699']
+  //       }]
+  //     },
+  //     options: {
+  //       responsive: true,
+  //       plugins: {
+  //         title: {
+  //           display: true,
+  //           text: 'User Statistics'
+  //         }
+  //       }
+  //     }
+  //   });
+  // }
 
-  createCreditChart() {
-    if (isPlatformBrowser(this.platformId)) {
-      const ctx = document.getElementById('creditChart') as HTMLCanvasElement;
-      this.creditChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: ['Total Users', 'Purchased Credit Users', 'Low Credit Users'],
-          datasets: [{
-            label: 'User Credit Distribution',
-            data: [this.totalUsers, this.purchasedCreditUsers, this.lowCreditUsers],
-            backgroundColor: ['#DB7093', '#003366', '#6699CC']
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            title: {
-              display: true,
-              text: 'Credit Distribution'
-            }
-          }
-        }
-      });
-    }
-    
-  }
+  // createCreditChart() {
+  //   const ctx = document.getElementById('creditChart') as HTMLCanvasElement;
+  //   this.creditChart = new Chart(ctx, {
+  //     type: 'bar',
+  //     data: {
+  //       labels: ['Total Users', 'Purchased Credit Users', 'Low Credit Users'],
+  //       datasets: [{
+  //         label: 'User Credit Distribution',
+  //         data: [this.totalUsers, this.purchasedCreditUsers, this.lowCreditUsers],
+  //         backgroundColor: ['#DB7093', '#003366', '#6699CC']
+  //       }]
+  //     },
+  //     options: {
+  //       responsive: true,
+  //       plugins: {
+  //         title: {
+  //           display: true,
+  //           text: 'Credit Distribution'
+  //         }
+  //       }
+  //     }
+  //   });
+  // }
 
 }
