@@ -1,5 +1,62 @@
-<div class="container mt-3">
-  <div class="row">
-    Chat
-  </div>
+<div class="chat-wrapper">
+  <mat-card class="chat-container">
+    <mat-card-header class="chat-header">
+      <div class="header-content d-flex align-items-center">
+        <div class="agent-info">
+          <mat-icon>support_agent</mat-icon>
+          <span>AI Support</span>
+        </div>
+        <button mat-mini-fab color="warn" (click)="endChat()" class="end-chat-btn">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    </mat-card-header>
+
+    <mat-card-content #chatContainer class="chat-messages">
+      <div class="message-list">
+        <div 
+          *ngFor="let message of messages" 
+          class="message-wrapper" 
+          [ngClass]="message.sender"
+          [@messageAnimation]>
+          <div class="message-content">
+            <div class="message-text">
+              {{ message.text }}
+            </div>
+            <div class="message-time">
+              {{ message.timestamp | date:'shortTime' }}
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="typingIndicator" class="typing-indicator">
+          <div class="typing-dots">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+          </div>
+          <span>AI is typing...</span>
+        </div>
+      </div>
+    </mat-card-content>
+
+    <mat-card-actions class="chat-input-area">
+      <mat-form-field appearance="outline" class="message-input">
+        <mat-label>Type your message</mat-label>
+        <input 
+          matInput 
+          [(ngModel)]="newMessage"
+          (keyup.enter)="sendMessage()"
+          placeholder="How can we help you today?"
+        >
+      </mat-form-field>
+      <button 
+        mat-fab 
+        color="primary" 
+        (click)="sendMessage()"
+        [disabled]="!newMessage.trim()">
+        <mat-icon>send</mat-icon>
+      </button>
+    </mat-card-actions>
+  </mat-card>
 </div>

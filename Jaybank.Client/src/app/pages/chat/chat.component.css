@@ -1,0 +1,151 @@
+.chat-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 118vh;
+  background-color: #f0f2f5;
+  padding: 20px;
+}
+
+.chat-container {
+  width: 100%;;
+  height: 700px;
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.chat-header {
+  background-color: #DB7093;
+  color: white;
+  padding: 15px;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.agent-info {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Space between icon and text */
+}
+
+.end-chat-btn {
+  margin-left: auto;
+  background-color: #003366;
+  color: white;
+}
+
+.agent-info mat-icon {
+  margin-right: 10px;
+}
+
+.chat-messages {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 15px;
+  background-color: #f9fafb;
+}
+
+.message-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.message-wrapper {
+  display: flex;
+  margin-bottom: 15px;
+  align-items: flex-start;
+}
+
+.message-wrapper.ai {
+  align-self: flex-start;
+}
+
+.message-wrapper.user {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+
+.message-content {
+  max-width: 70%;
+  display: flex;
+  flex-direction: column;
+}
+
+.message-wrapper.ai .message-content {
+  background-color: #e5e5ea;
+  color: black;
+}
+
+.message-wrapper.user .message-content {
+  background-color: #DB7093;
+  color: white;
+}
+
+.message-text {
+  padding: 10px;
+  border-radius: 12px;
+  word-wrap: break-word;
+}
+
+.message-time {
+  font-size: 0.7em;
+  color: rgba(0,0,0,0.5);
+  margin-top: 5px;
+  text-align: right;
+}
+
+.user .message-time {
+  color: rgba(255,255,255,0.7);
+}
+
+.chat-input-area {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  background-color: white;
+  border-top: 1px solid #e0e0e0;
+}
+
+.message-input {
+  flex-grow: 1;
+  margin-right: 15px;
+}
+
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.typing-dots {
+  display: flex;
+  margin-right: 10px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  background-color: #DB7093;
+  border-radius: 50%;
+  margin: 0 4px;
+  animation: typing 1.4s infinite;
+}
+
+.dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typing {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
