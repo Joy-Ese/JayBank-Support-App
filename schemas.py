@@ -7,6 +7,9 @@ class EncryptedRequest(BaseModel):
 #   status: bool
 #   message: str
 
+class ChatRequest(BaseModel):
+  user_query: str
+
 class CreateAdmin(BaseModel):
   username: str
   email: EmailStr
@@ -25,9 +28,11 @@ class UserLogin(BaseModel):
 
 class GetUserResp(BaseModel):
   first_name: str
-  last_name: str
   username: str
   email: EmailStr
+  credits_remaining: int
+  plan_subscribed_to: str
+  role: str
 
-  class Config:
-    from_attributes = True
+  # class Config:
+  #   from_attributes = True
