@@ -5,7 +5,7 @@ from models import Base
 from seed import seed_credits
 from routers import auth, chat, user, admin
 
-app = FastAPI(title="JayBank Customer Support API")
+app = FastAPI(title="JayBank Support API")
 
 origins = [
   "http://localhost:4200",

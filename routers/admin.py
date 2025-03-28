@@ -33,15 +33,19 @@ def create_admin(admin: schemas.CreateAdmin, db: Session = Depends(get_db)):
   
   return {"status": True, "message": "Admin created successfully"}
 
-@router.post("/admin-login")
-def login(admin: schemas.AdminLogin, db: Session = Depends(get_db)):
-  db_admin = db.query(models.Admin).filter(models.Admin.username == admin.username).first()
+@router.get("/details", dependencies=[Depends(get_current_admin)])
+def get_admin_details(admin: dict = Depends(get_current_admin), db: Session = Depends(get_db)):
+  db_admin = db.query(models.Admin).filter(models.Admin.id == admin["id"]).first()
   if not db_admin:
-    raise HTTPException(status_code=400, detail="There is no such Admin")
+    raise HTTPException(status_code=404, detail="User not found")
+  
+  return {
+    "id": db_admin.id,
+    "username": db_admin.username,
+    "email": db_admin.email,
+    "role": db_admin.role
+  }
 
-  token = create_access_token({"username": db_admin.username})
-
-  return {"access_token": token, "token_type": "bearer"}
 
 # Get Total Number of Users (Admin Only)
 @router.get("/total-users", dependencies=[Depends(get_current_admin)])

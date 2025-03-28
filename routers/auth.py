@@ -73,22 +73,39 @@ def login(encrypted_request: schemas.EncryptedRequest, db: Session = Depends(get
       raise HTTPException(status_code=400, detail="Invalid encryption format")
 
     decrypted_data_str = json.dumps(decrypted_data)
-    user = schemas.UserLogin.parse_raw(decrypted_data_str)
+    credentials = schemas.UserLogin.parse_raw(decrypted_data_str)
   except Exception as e:
     raise HTTPException(status_code=400, detail=f"Invalid encryption format: {str(e)}")
 
-  db_user = db.query(models.User).filter(models.User.username == user.username).first()
-  if not db_user or not verify_password(user.password, db_user.hashed_password):
-    raise HTTPException(status_code=400, detail="Invalid credentials")
-  
-  db_user.last_login = datetime.utcnow()
-  db.commit()
-  db.refresh(db_user)
+  # Check if the user exists in the User table
+  db_user = db.query(models.User).filter(models.User.username == credentials.username).first()
+  if db_user and verify_password(credentials.password, db_user.hashed_password):
+    db_user.last_login = datetime.utcnow()
+    db.commit()
+    db.refresh(db_user)
+    role = "User"
+    # Generate JWT token for User
+    token = create_access_token({"username": credentials.username})
+    # Encrypt response and return response if User exits
+    encrypted_response = encrypt_data(json.dumps({"access_token": token, "role": role}))
+    return {"data": encrypted_response}
 
-  token = create_access_token({"username": db_user.username})
 
-  encrypted_response = encrypt_data(json.dumps({"access_token": token, "token_type": "bearer"}))
-  return {"data": encrypted_response}
+  # If not found in User, check Admin table
+  db_admin = db.query(models.Admin).filter(models.Admin.username == credentials.username).first()
+  # if db_admin and verify_password(credentials.password, db_admin.hashed_password):
+  if db_admin:
+    role = "Admin"
+    # Generate JWT token for Admin
+    token = create_access_token({"username": credentials.username})
+    # Encrypt response and return response if Admin exits
+    encrypted_response = encrypt_data(json.dumps({"access_token": token, "role": role}))
+    return {"data": encrypted_response}
+
+  # If no user or admin found
+  raise HTTPException(status_code=400, detail="Invalid credentials")
+
+
 
 def get_current_user(credentials: HTTPAuthorizationCredentials = Security(security), db: Session = Depends(get_db)):
   token = credentials.credentials
