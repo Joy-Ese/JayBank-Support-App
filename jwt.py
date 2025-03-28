@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from fastapi import HTTPException
 from jose import JWTError, jwt
 
 SECRET_KEY = "your_secret_key"
@@ -16,4 +17,4 @@ def verify_token(token: str):
     payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
     return payload
   except JWTError:
-    return None
+    raise HTTPException(status_code=401, detail="Invalid token")
