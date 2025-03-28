@@ -14,6 +14,4 @@ export const adminGuard: CanMatchFn = (route, segments) => {
     router.navigate(['/login']); // Redirect if not an Admin
     return false;
   }
-
-  return true;
 };
