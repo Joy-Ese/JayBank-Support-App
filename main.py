@@ -3,9 +3,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from database import SessionLocal, engine
 from models import Base
 from seed import seed_credits
-from routers import auth, chat, user
+from routers import auth, chat, user, admin
 
-app = FastAPI(title="JayBank Customer Support API")
+app = FastAPI(title="JayBank Support API")
 
 origins = [
   "http://localhost:4200",
@@ -25,6 +25,7 @@ Base.metadata.create_all(bind=engine)
 app.include_router(auth.router, prefix="/auth", tags=["Auth"])
 app.include_router(chat.router, prefix="/chat", tags=["Chat"])
 app.include_router(user.router, prefix="/user", tags=["User"])
+app.include_router(admin.router, prefix="/admin", tags=["Admin"])
 
 @app.on_event("startup")
 def startup_event():

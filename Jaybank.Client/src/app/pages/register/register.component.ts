@@ -72,7 +72,7 @@ export class RegisterComponent {
           this.respMsg = decryptedResponseObject.message;
         }
         if (this.status == true) {
-          setTimeout(() => {this.domDocument.location.replace("/login")}, 4000);
+          setTimeout(() => {this.domDocument.location.replace("/login")}, 1000);
         }
       },
       error: (err) => {

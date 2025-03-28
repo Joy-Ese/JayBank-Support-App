@@ -7,6 +7,11 @@ class EncryptedRequest(BaseModel):
 #   status: bool
 #   message: str
 
+class CreateAdmin(BaseModel):
+  username: str
+  email: EmailStr
+  role: str
+
 class CreateUser(BaseModel):
   first_name: str
   last_name: str

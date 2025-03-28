@@ -7,6 +7,8 @@ import { NootificationsComponent } from './pages/nootifications/nootifications.c
 import { ApiDesignComponent } from './pages/api-design/api-design.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { ChatComponent } from './pages/chat/chat.component';
+import { adminGuard } from './guards/admin.guard';
+import { userGuard } from './guards/user.guard';
 
 export const routes: Routes = [
   {
@@ -39,11 +41,13 @@ export const routes: Routes = [
     component: ApiDesignComponent
   },
   {
-    path: "dashboard",
+    path: 'dashboard',
+    canMatch: [adminGuard], // Admin-only route
     component: DashboardComponent
   },
   {
-    path: "chat",
+    path: 'chat',
+    canMatch: [userGuard], // User-only route
     component: ChatComponent
-  },
+  }
 ];

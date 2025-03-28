@@ -12,27 +12,44 @@
           <li class="nav-item">
             <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
           </li>
+
+          <div class="d-flex justify-content-between" *ngIf="userName; else loggedOut">
+            <li class="nav-item" *ngIf="role === 'User'">
+              <a class="nav-link" routerLink="/notifications" routerLinkActive="active">Notifications</a>
+            </li>
+
+            <li class="nav-item" *ngIf="role === 'Admin'">
+              <a class="nav-link" routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+            </li>
+
+            <li class="nav-item" *ngIf="role === 'User'">
+              <a class="nav-link" routerLink="/chat" routerLinkActive="active">Chat</a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" routerLinkActive="active" (click)="logout()">Log Out</a>
+            </li>
+
+          </div>
+
+          <ng-template #loggedOut>
+            <li class="nav-item">
+              <a class="nav-link" routerLink="/login" routerLinkActive="active">Login</a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" routerLink="/register" routerLinkActive="active">Register</a>
+            </li>
+          </ng-template>
+
           <li class="nav-item">
             <a class="nav-link" routerLink="/pricing" routerLinkActive="active">Pricing</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" routerLink="/notifications" routerLinkActive="active">Notifications</a>
-          </li>
+
           <li class="nav-item">
             <a class="nav-link" routerLink="/api-design" routerLinkActive="active">API Design</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" routerLink="/chat" routerLinkActive="active">Chat</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" routerLink="/register" routerLinkActive="active">Register</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" routerLink="/login" routerLinkActive="active">Login</a>
-          </li>
+
         </ul>
       </div>
     </div>
