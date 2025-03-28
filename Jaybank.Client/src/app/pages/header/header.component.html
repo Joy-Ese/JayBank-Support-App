@@ -13,7 +13,7 @@
             <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
           </li>
 
-          <div *ngIf="userName; else loggedOut">
+          <div class="d-flex justify-content-between" *ngIf="userName; else loggedOut">
             <li class="nav-item" *ngIf="role === 'User'">
               <a class="nav-link" routerLink="/notifications" routerLinkActive="active">Notifications</a>
             </li>
