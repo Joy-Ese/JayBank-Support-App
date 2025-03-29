@@ -15,11 +15,17 @@ export class AuthService {
   }
 
   getToken(): string | null {
-    return localStorage.getItem("token"); // Retrieve token from localStorage
+    if (typeof window !== 'undefined' && localStorage) {
+      return localStorage.getItem("token"); // Retrieve token from localStorage
+    }
+    return null;
   }
 
   getRole(): string | null {
-    return localStorage.getItem("role"); // Retrieve role from localStorage
+    if (typeof window !== 'undefined' && localStorage) {
+      return localStorage.getItem("role"); // Retrieve role from localStorage
+    }
+    return null;
   }
 
   // Keep token saved after login

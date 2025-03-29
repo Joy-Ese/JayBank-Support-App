@@ -12,30 +12,28 @@
       </div>
     </mat-card-header>
 
+
     <mat-card-content #chatContainer class="chat-messages">
-      <div class="message-list">
-        <div 
-          *ngFor="let message of messages" 
-          class="message-wrapper" 
-          [ngClass]="message.sender"
-          [@messageAnimation]>
-          <div class="message-content">
-            <div class="message-text">
-              {{ message.text }}
-            </div>
-            <div class="message-time">
-              {{ message.timestamp | date:'shortTime' }}
-            </div>
+      <div class="message-wrapper ai">
+        <div class="message-content">
+          <div class="message-text">
+            <strong>AI:</strong> {{ greeting }}, {{ userName || 'User' }}! I'm your AI Support assistant. How can I help you today?
           </div>
         </div>
+      </div>
 
-        <div *ngIf="typingIndicator" class="typing-indicator">
-          <div class="typing-dots">
-            <div class="dot"></div>
-            <div class="dot"></div>
-            <div class="dot"></div>
+      <div class="message-list">
+        <div class="message-list">
+          <div *ngFor="let message of messages" class="message-wrapper" [ngClass]="{'user': message.chat_from_user, 'ai': message.response_from_ai}" [@messageAnimation]>
+            <div class="message-content">
+              <div *ngIf="message.chat_from_user" class="user-message">
+                <strong>You:</strong> {{ message.chat_from_user }}
+              </div>
+              <div *ngIf="message.response_from_ai" class="ai-message">
+                <strong>AI:</strong> {{ message.response_from_ai }}
+              </div>
+            </div>
           </div>
-          <span>AI is typing...</span>
         </div>
       </div>
     </mat-card-content>
