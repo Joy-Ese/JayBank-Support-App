@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Float, Text, Boolean
+from sqlalchemy import Column, Enum, Integer, String, ForeignKey, DateTime, Float, Text, Boolean
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from database import Base
@@ -15,6 +15,7 @@ class User(Base):
   last_login = Column(DateTime, default=datetime.utcnow)
   credits_remaining = Column(Integer, default=0)
   plan_subscribed_to = Column(String, nullable=True)
+  role = Column(String, nullable=False)
 
   transactions = relationship("CreditsTransaction", back_populates="user")
   queues = relationship("Queue", back_populates="user")
@@ -29,7 +30,7 @@ class Admin(Base):
   id = Column(Integer, primary_key=True, index=True)
   username = Column(String, unique=True, nullable=False)
   email = Column(String, unique=True, nullable=False)
-  role = Column(String, unique=True, nullable=False)
+  role = Column(String, nullable=False)
 
 
 class Credit(Base):
@@ -39,6 +40,7 @@ class Credit(Base):
   plan = Column(String, nullable=True)
   amount = Column(Float, nullable=False)
   benefits = Column(String, nullable=True)
+  credits = Column(Integer)
 
 
 class CreditsTransaction(Base):
@@ -59,6 +61,7 @@ class Queue(Base):
   id = Column(Integer, primary_key=True, index=True)
   user_id = Column(Integer, ForeignKey("users.id")) 
   queries_submitted = Column(String, nullable=False)
+  status = Column(Enum("pending", "processing", "completed", "failed", name="chat_status"), default="pending")
 
   user = relationship("User", back_populates="queues")
 
@@ -90,7 +93,9 @@ class Notification(Base):
 
   id = Column(Integer, primary_key=True, index=True)
   user_id = Column(Integer, ForeignKey("users.id")) 
-  status = Column(Boolean, nullable=False)
+  # status = Column(Boolean, nullable=False)
+  status = Column(Enum("unread", "read", name="notification_status"), default="unread")
   message = Column(String, nullable=False)
+  time_stamp = Column(DateTime, default=datetime.utcnow)
 
   user = relationship("User", back_populates="notifications")

@@ -1,6 +1,5 @@
 import requests
 from fastapi import APIRouter, Depends, HTTPException
-from openai import OpenAI
 from datetime import datetime
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
@@ -9,20 +8,9 @@ import models
 import schemas
 from routers.auth import get_current_user
 from routers.user import get_user_details
+from mistral_integration import query_mistral
 
 router = APIRouter()
-
-# client = OpenAI(
-#   api_key="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"
-# )
-
-MISTRAL_API_KEY = "t65ouezXOnafMSBROYnuzprd4nKM3w1o"
-
-MISTRAL_API_URL = "https://api.mistral.ai/v1/chat/completions"
-HEADERS = {
-  "Authorization": f"Bearer {MISTRAL_API_KEY}",
-  "Content-Type": "application/json"
-}
 
 @router.post("/query", dependencies=[Depends(get_current_user)])
 def send_user_chat(query: schemas.ChatRequest, db: Session = Depends(get_db), db_user: models.User = Depends(get_user_details)):

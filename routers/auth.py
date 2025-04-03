@@ -52,8 +52,9 @@ def register(encrypted_request: schemas.EncryptedRequest, db: Session = Depends(
     username=user.username,
     email=user.email,
     hashed_password=hashed_password,
-    credits_remaining=20,
-    plan_subscribed_to=free_plan.plan
+    credits_remaining=free_plan.credits,
+    plan_subscribed_to=free_plan.plan,
+    role = "User"
   )
 
   db.add(new_user)
