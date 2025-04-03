@@ -1,3 +1,4 @@
+from fastapi import HTTPException
 import requests
 
 # Adding Mistral API Key
@@ -39,6 +40,9 @@ def query_mistral(user_query: str) -> str:
     response = requests.post(MISTRAL_API_URL, headers=HEADERS, json=payload)
     response_data = response.json()
     print("Mistral API Response:", response_data)
+
+    if "choices" not in response_data:
+      raise HTTPException(status_code=500, detail="Error from Mistral AI")
 
     # Check for API errors
     if "error" in response_data:

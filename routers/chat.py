@@ -1,23 +1,37 @@
-import requests
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from datetime import datetime
 from sqlalchemy.orm import Session
-from sqlalchemy import or_
 from database import get_db
 import models
 import schemas
 from routers.auth import get_current_user
 from routers.user import get_user_details
-from mistral_integration import query_mistral
+from queue_processor import process_queue
 
 router = APIRouter()
 
 @router.post("/query", dependencies=[Depends(get_current_user)])
-def send_user_chat(query: schemas.ChatRequest, db: Session = Depends(get_db), db_user: models.User = Depends(get_user_details)):
+def send_user_chat(
+  query: schemas.ChatRequest, 
+  db: Session = Depends(get_db), 
+  db_user: models.User = Depends(get_user_details),
+  background_tasks: BackgroundTasks = Depends(BackgroundTasks)
+  ):
   print(db_user)
 
+  # Check that user's credit balance is more than 0
   if db_user.credits_remaining <= 0:
-    return {"error": "Insufficient credits. Please purchase some credits."}
+    # Add to user's chat request to queue if no available credits
+    new_queue_entry = models.Queue(user_id=db_user.id, queries_submitted=query.user_query, status="pending")
+    db.add(new_queue_entry)
+    db.commit()
+    db.refresh(new_queue_entry) 
+    return {"message": "Insufficient credits. Your query is pending and has been queued."}
+
+  new_queue_entry = models.Queue(user_id=db_user.id, queries_submitted=query.user_query, status="processing")
+  db.add(new_queue_entry)
+  db.commit()
+  db.refresh(new_queue_entry) 
 
   # Deduct 1 credit per query
   db_user.credits_remaining -= 1 
@@ -30,39 +44,16 @@ def send_user_chat(query: schemas.ChatRequest, db: Session = Depends(get_db), db
     chat_from_user=query.user_query,
     time_sent=datetime.utcnow(),
   )
-
   db.add(new_user_chat)
   db.commit()
   db.refresh(new_user_chat)
 
-  # Call Mistral AI API
-  payload = {
-    "model": "mistral-small",
-    "messages": [{"role": "user", "content": query.user_query}]
-  }
+  # process_queue(db, db_user)
+  # Call process_queue asynchronously using BackgroundTasks
+  background_tasks.add_task(process_queue, db, db_user) 
 
-  response = requests.post(MISTRAL_API_URL, headers=HEADERS, json=payload)
-  ai_response = response.json()
-  print("Mistral API Response:", ai_response) 
+  return {"message": "Your query is in the queue for processing."}
 
-  if "choices" not in ai_response:
-    raise HTTPException(status_code=500, detail="Error from Mistral AI")
-
-  # Extract AI response text
-  ai_response_text = ai_response["choices"][0]["message"]["content"]
-
-  # Add AI response to the db
-  new_AI_response = models.AIResponse(
-    user_id=db_user.id,
-    response_from_ai=ai_response_text,
-    time_responded=datetime.utcnow(),
-  )
-
-  db.add(new_AI_response)
-  db.commit()
-  db.refresh(new_AI_response)
-
-  return {"response": ai_response_text}
 
 @router.get("/user-chats", dependencies=[Depends(get_current_user)])
 def fetch_user_chats(db: Session = Depends(get_db), db_user: models.User = Depends(get_user_details)):
