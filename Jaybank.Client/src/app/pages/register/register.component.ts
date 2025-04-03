@@ -79,9 +79,10 @@ export class RegisterComponent {
           this.status = decryptedResponseObject.status;
           this.respMsg = decryptedResponseObject.message;
         }
+        debugger
         if (decryptedResponseObject.status == true) {
           this.showToast();
-          // setTimeout(() => {this.domDocument.location.replace("/login")}, 1000);
+          setTimeout(() => {this.domDocument.location.replace("/login")}, 1000);
         }
       },
       error: (err) => {

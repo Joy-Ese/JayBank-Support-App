@@ -23,7 +23,7 @@ async def process_queue(db: Session = Depends(get_db), db_user: models.User = De
     for query in pending_queries:
       query.status = "processing"
       db.commit() 
-      db.refresh(pending_queries) 
+      db.refresh(query) 
 
       # Add the logic to process the query 
       ai_response = await query_mistral(query.queries_submitted) 
@@ -43,7 +43,7 @@ async def process_queue(db: Session = Depends(get_db), db_user: models.User = De
       # Process each query and update database and USERRRRRR with MQTT and toastr when completed
       query.status = "completed"
       db.commit()
-      db.refresh(pending_queries) 
+      db.refresh(query) 
 
     await asyncio.sleep(60)
 

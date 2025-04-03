@@ -13,9 +13,9 @@ router = APIRouter()
 @router.post("/query", dependencies=[Depends(get_current_user)])
 def send_user_chat(
   query: schemas.ChatRequest, 
+  background_tasks: BackgroundTasks,
   db: Session = Depends(get_db), 
-  db_user: models.User = Depends(get_user_details),
-  background_tasks: BackgroundTasks = Depends(BackgroundTasks)
+  db_user: models.User = Depends(get_user_details)
   ):
   print(db_user)
 
@@ -33,10 +33,14 @@ def send_user_chat(
   db.commit()
   db.refresh(new_queue_entry) 
 
-  # Deduct 1 credit per query
-  db_user.credits_remaining -= 1 
-  db.commit() 
-  db.refresh(db_user) 
+  # Get the database user model from the pydantic schema and deduct 1 credit per query
+  user_model = db.query(models.User).filter(models.User.id == db_user.id).first()
+  user_model.credits_remaining -= 1
+  db.commit()
+  db.refresh(user_model) 
+
+  # Update your Pydantic model if needed later
+  db_user.credits_remaining = user_model.credits_remaining
 
   # Add user's chat to the db
   new_user_chat = models.Chat(
