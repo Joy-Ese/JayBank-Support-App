@@ -1,5 +1,9 @@
 <app-header></app-header>
 <main class="container-fluid p-0">
+  <div [class.hidden]="!showLoader" class="loader-overlay">
+    <div class="spinner"></div>
+  </div>
+
   <router-outlet></router-outlet>
 </main>
 <app-footer></app-footer>

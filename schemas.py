@@ -1,4 +1,6 @@
 from pydantic import BaseModel, EmailStr
+from datetime import datetime
+from enum import Enum
 
 class EncryptedRequest(BaseModel):
   encrypted_data: str
@@ -30,3 +32,11 @@ class UserResponse(BaseModel):
   credits_remaining: int
   plan_subscribed_to: str
   role: str
+
+class NotificationStatus(str, Enum):
+  unread = "unread"
+  read = "read"
+
+
+
+

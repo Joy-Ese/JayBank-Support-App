@@ -30,10 +30,25 @@ async def query_mistral(user_query: str) -> str:
   # Define the request payload
   payload = {
     "model": "mistral-small",
-    "messages": [{"role": "user", "content": user_query}],
-    "temperature": 0.7,
-    "max_tokens": 200,  # Limit response length
+    "messages": [
+      {
+        "role": "system",
+        "content": (
+          "You are JB, a professional virtual assistant for a financial institution."
+          "You provide support to users on banking services including transactions, account issues, and digital banking queries."
+          "Always prioritize user privacy, avoid speculation, and never ask for sensitive information such as PINs or card details."
+          "Always respond as if you're assisting a real banking customer."
+          "Never share personal data. Do not perform financial transactions."
+        )
+      },
+      {"role": "user", "content": user_query}
+    ],
+    "temperature": 0.5,
+    "max_tokens": 300,  # Limit response length
   }
+
+  if "account number" in user_query.lower():
+    return "For security reasons, I can't discuss sensitive information like account numbers. Please contact a bank representative."
 
   try:
     # Make asynchronous HTTP request to Mistral API
@@ -43,18 +58,24 @@ async def query_mistral(user_query: str) -> str:
         headers=HEADERS,
         json=payload
       )
-      response_data = response.json()
-      print("Mistral API Response:", response_data)
+      response.raise_for_status()
 
-      if "choices" not in response_data:
-        raise HTTPException(status_code=500, detail="Invalid response from Mistral AI")
+    response_data = response.json()
+    print("Mistral API Response:", response_data)
 
-      if "error" in response_data:
-        raise ValueError(f"Mistral API Error: {response_data['error']['message']}")
+    if "choices" not in response_data:
+      raise HTTPException(status_code=500, detail="Invalid response from Mistral AI")
 
-      # Extract AI response
-      ai_response_text = response_data["choices"][0]["message"]["content"]
-      return ai_response_text
+    choices = response_data.get("choices")
+    if not choices:
+      raise HTTPException(status_code=500, detail="No choices returned by Mistral AI.")
+
+    if "error" in response_data:
+      raise ValueError(f"Mistral API Error: {response_data['error']['message']}")
+
+    # Extract AI response
+    ai_response_text = choices[0]["message"]["content"]
+    return ai_response_text
 
   except httpx.RequestError as e:
     raise ValueError(f"Error connecting to Mistral API: {str(e)}")

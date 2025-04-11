@@ -2,11 +2,31 @@
   margin-bottom: 15px;
   border-left: 4px solid transparent;
   transition: all 0.3s ease;
+  opacity: 0.85;
+}
+
+.card.unread {
+  opacity: 1;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  background-color: #f8f9fa;
+  border-left-width: 5px;
 }
 
 .card:hover {
   transform: translateX(10px);
   box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  opacity: 1;
+}
+
+.notification-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.notification-actions {
+  display: flex;
+  align-items: center;
 }
 
 .card-body {
@@ -15,9 +35,16 @@
   align-items: center;
 }
 
-.card-title {
-  color: #DB7093;
-  margin-bottom: 10px;
+.unread-indicator {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  background-color: #003366;
+  border-radius: 50%;
+  position: absolute;
+  left: -15px;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .text-muted {
@@ -25,24 +52,15 @@
   color: #6c757d;
 }
 
+.bigBtn {
+  background-color: #003366;
+  color: white;
+}
+
 .btn-sm {
   margin-left: 15px;
-}
-
-.card.success {
-  border-left-color: #28a745;
-}
-
-.card.warning {
-  border-left-color: #ffc107;
-}
-
-.card.info {
-  border-left-color: #17a2b8;
-}
-
-.card.error {
-  border-left-color: #dc3545;
+  background-color: #003366;
+  color: white;
 }
 
 @media (max-width: 768px) {
@@ -54,5 +72,14 @@
   .btn-sm {
     margin-left: 0;
     margin-top: 10px;
+  }
+
+  .notification-content {
+    flex-direction: column;
+  }
+
+  .notification-actions {
+    margin-top: 15px;
+    justify-content: flex-end;
   }
 }

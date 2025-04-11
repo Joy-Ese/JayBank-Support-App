@@ -2,10 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
 from database import get_db
-from encryption import encrypt_data, decrypt_data
 import models
 import schemas
-from jwt import create_access_token, verify_token
 from routers.auth import get_current_admin
 
 router = APIRouter()
