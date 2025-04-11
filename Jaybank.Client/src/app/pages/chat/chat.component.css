@@ -17,7 +17,7 @@
 }
 
 .chat-header {
-  background-color: #DB7093;
+  background-color: #003366;
   color: white;
   padding: 15px;
 }
@@ -58,50 +58,48 @@
 
 .message-wrapper {
   display: flex;
-  margin-bottom: 15px;
-  align-items: flex-start;
-}
-
-.message-wrapper.ai {
-  align-self: flex-start;
+  flex-direction: column;
+  width: 100%;
+  margin-bottom: 10px;
 }
 
 .message-wrapper.user {
-  align-self: flex-end;
-  flex-direction: row-reverse;
+  align-items: flex-end;
+}
+
+.message-wrapper.ai {
+  align-items: flex-start;
 }
 
 .message-content {
   max-width: 70%;
-  display: flex;
-  flex-direction: column;
+  padding: 10px;
+  border-radius: 10px;
+  word-wrap: break-word;
+  margin: 8px 0;
 }
 
-.message-wrapper.ai .message-content {
-  background-color: #e5e5ea;
-  color: black;
-}
-
-.message-wrapper.user .message-content {
-  background-color: #DB7093;
+.user-message {
+  background-color: #003366;
   color: white;
+  padding: 10px;
+  border-radius: 12px;
+  margin-left: auto;
+}
+
+.ai-message {
+  background-color: #f1f1f1;
+  color: black;
+  padding: 10px;
+  border-radius: 12px;
 }
 
 .message-text {
   padding: 10px;
   border-radius: 12px;
   word-wrap: break-word;
-}
-
-.message-time {
-  font-size: 0.7em;
-  color: rgba(0,0,0,0.5);
-  margin-top: 5px;
-  text-align: right;
-}
-
-.user .message-time {
-  color: rgba(255,255,255,0.7);
+  background-color: #f1f1f1;
+  color: black;
 }
 
 .chat-input-area {

@@ -5,6 +5,7 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { EncryptionService } from '../../services/encryption.service';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
+import { LoaderService } from '../../services/loader.service';
 
 @Component({
   selector: 'app-login',
@@ -30,6 +31,7 @@ export class LoginComponent implements OnInit{
     private fb: FormBuilder,
     private encryptionService : EncryptionService,
     private authService: AuthService,
+    private loaderService: LoaderService,
     private router: Router,
   ) {
     this.loginForm = this.fb.group({
@@ -72,8 +74,10 @@ export class LoginComponent implements OnInit{
               localStorage.setItem("userId", res.username);
               if (this.authService.isAuthenticated() && this.authService.isUser()) {
                 setTimeout(() => {
+                  this.loaderService.disable();
                   this.router.navigate(['/chat']).then(() => {
                     location.reload();
+                    this.loaderService.enable();
                   });
                 }, 1000);
               }
@@ -98,8 +102,10 @@ export class LoginComponent implements OnInit{
               localStorage.setItem("userId", res.username);
               if (this.authService.isAuthenticated()) {
                 setTimeout(() => {
+                  this.loaderService.disable();
                   this.router.navigate(['/dashboard']).then(() => {
                     location.reload();
+                    this.loaderService.enable();
                   });
                 }, 1000);
               }
@@ -118,9 +124,6 @@ export class LoginComponent implements OnInit{
       }
     })
   }
-
-
-
 
 
   

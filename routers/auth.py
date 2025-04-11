@@ -52,8 +52,9 @@ def register(encrypted_request: schemas.EncryptedRequest, db: Session = Depends(
     username=user.username,
     email=user.email,
     hashed_password=hashed_password,
-    credits_remaining=20,
-    plan_subscribed_to=free_plan.plan
+    credits_remaining=free_plan.credits,
+    plan_subscribed_to=free_plan.plan,
+    role = "User"
   )
 
   db.add(new_user)
@@ -83,7 +84,7 @@ def login(encrypted_request: schemas.EncryptedRequest, db: Session = Depends(get
     db_user.last_login = datetime.utcnow()
     db.commit()
     db.refresh(db_user)
-    role = "User"
+    role = db_user.role
     # Generate JWT token for User
     token = create_access_token({"username": credentials.username})
     # Encrypt response and return response if User exits
@@ -95,7 +96,7 @@ def login(encrypted_request: schemas.EncryptedRequest, db: Session = Depends(get
   db_admin = db.query(models.Admin).filter(models.Admin.username == credentials.username).first()
   # if db_admin and verify_password(credentials.password, db_admin.hashed_password):
   if db_admin:
-    role = "Admin"
+    role = db_admin.role
     # Generate JWT token for Admin
     token = create_access_token({"username": credentials.username})
     # Encrypt response and return response if Admin exits
@@ -115,7 +116,7 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Security(securi
   if not user:
     raise HTTPException(status_code=401, detail="Unauthorized Access")
 
-  return {"id": user.id, "role": "User"}
+  return {"id": user.id, "role": user.role}
 
 def get_current_admin(credentials: HTTPAuthorizationCredentials = Security(security), db: Session = Depends(get_db)):
   token = credentials.credentials

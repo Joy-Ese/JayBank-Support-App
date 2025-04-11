@@ -1,11 +1,9 @@
 from pydantic import BaseModel, EmailStr
+from datetime import datetime
+from enum import Enum
 
 class EncryptedRequest(BaseModel):
   encrypted_data: str
-
-# class ResponseModel(BaseModel):
-#   status: bool
-#   message: str
 
 class ChatRequest(BaseModel):
   user_query: str
@@ -26,13 +24,19 @@ class UserLogin(BaseModel):
   username: str
   password: str
 
-class GetUserResp(BaseModel):
+class UserResponse(BaseModel):
+  id: int
   first_name: str
   username: str
-  email: EmailStr
+  email: str
   credits_remaining: int
   plan_subscribed_to: str
   role: str
 
-  # class Config:
-  #   from_attributes = True
+class NotificationStatus(str, Enum):
+  unread = "unread"
+  read = "read"
+
+
+
+

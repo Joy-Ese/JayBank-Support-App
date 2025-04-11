@@ -1,8 +1,8 @@
 """Initial migration
 
-Revision ID: 576f53c0ea6e
+Revision ID: 1c4f0244fb4f
 Revises: 
-Create Date: 2025-03-22 16:47:20.599478
+Create Date: 2025-04-03 12:07:52.143210
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '576f53c0ea6e'
+revision: str = '1c4f0244fb4f'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -28,7 +28,6 @@ def upgrade() -> None:
     sa.Column('role', sa.String(), nullable=False),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email'),
-    sa.UniqueConstraint('role'),
     sa.UniqueConstraint('username')
     )
     op.create_index(op.f('ix_admins_id'), 'admins', ['id'], unique=False)
@@ -37,6 +36,7 @@ def upgrade() -> None:
     sa.Column('plan', sa.String(), nullable=True),
     sa.Column('amount', sa.Float(), nullable=False),
     sa.Column('benefits', sa.String(), nullable=True),
+    sa.Column('credits', sa.Integer(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_credits_id'), 'credits', ['id'], unique=False)
@@ -50,6 +50,7 @@ def upgrade() -> None:
     sa.Column('last_login', sa.DateTime(), nullable=True),
     sa.Column('credits_remaining', sa.Integer(), nullable=True),
     sa.Column('plan_subscribed_to', sa.String(), nullable=True),
+    sa.Column('role', sa.String(), nullable=False),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email'),
     sa.UniqueConstraint('username')
@@ -86,8 +87,9 @@ def upgrade() -> None:
     op.create_table('user_notifications',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=True),
-    sa.Column('status', sa.Boolean(), nullable=False),
+    sa.Column('status', sa.Enum('unread', 'read', name='notification_status'), nullable=True),
     sa.Column('message', sa.String(), nullable=False),
+    sa.Column('time_stamp', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -96,6 +98,7 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=True),
     sa.Column('queries_submitted', sa.String(), nullable=False),
+    sa.Column('status', sa.Enum('pending', 'processing', 'completed', 'failed', name='chat_status'), nullable=True),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
