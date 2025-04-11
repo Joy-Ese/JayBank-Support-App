@@ -1,5 +1,5 @@
 from fastapi import HTTPException
-import requests
+import httpx
 
 # Adding Mistral API Key
 MISTRAL_API_KEY = "t65ouezXOnafMSBROYnuzprd4nKM3w1o"
@@ -11,16 +11,16 @@ HEADERS = {
   "Content-Type": "application/json"
 }
 
-# Add function to call Mistral AI
-def query_mistral(user_query: str) -> str:
+# Add function to call Mistral AI asynchronously
+async def query_mistral(user_query: str) -> str:
   """
-    Sends a user's query to Mistral AI and retrieves the response from the AI.
+  Sends a user's query to Mistral AI and retrieves the response from the AI.
 
-    Args:
-      user_query (str): The text query from the user.
+  Args:
+    user_query (str): The text query from the user.
 
-    Returns:
-      str: The AI-generated response.
+  Returns:
+    str: The AI-generated response.
   """
 
   # Check if API key is available
@@ -36,23 +36,26 @@ def query_mistral(user_query: str) -> str:
   }
 
   try:
-    # API request
-    response = requests.post(MISTRAL_API_URL, headers=HEADERS, json=payload)
-    response_data = response.json()
-    print("Mistral API Response:", response_data)
+    # Make asynchronous HTTP request to Mistral API
+    async with httpx.AsyncClient(timeout=30.0) as client:
+      response = await client.post(
+        MISTRAL_API_URL,
+        headers=HEADERS,
+        json=payload
+      )
+      response_data = response.json()
+      print("Mistral API Response:", response_data)
 
-    if "choices" not in response_data:
-      raise HTTPException(status_code=500, detail="Error from Mistral AI")
+      if "choices" not in response_data:
+        raise HTTPException(status_code=500, detail="Invalid response from Mistral AI")
 
-    # Check for API errors
-    if "error" in response_data:
-      raise ValueError(f"Mistral API Error: {response_data['error']['message']}")
+      if "error" in response_data:
+        raise ValueError(f"Mistral API Error: {response_data['error']['message']}")
 
-    # Extract AI response
-    ai_response_text = response_data["choices"][0]["message"]["content"]
-    return ai_response_text
+      # Extract AI response
+      ai_response_text = response_data["choices"][0]["message"]["content"]
+      return ai_response_text
 
-  except requests.exceptions.RequestException as e:
+  except httpx.RequestError as e:
     raise ValueError(f"Error connecting to Mistral API: {str(e)}")
-
 

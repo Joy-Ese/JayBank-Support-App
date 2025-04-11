@@ -60,6 +60,7 @@ class Queue(Base):
 
   id = Column(Integer, primary_key=True, index=True)
   user_id = Column(Integer, ForeignKey("users.id")) 
+  query_id = Column(Integer, ForeignKey("user_chats.id"))
   queries_submitted = Column(String, nullable=False)
   status = Column(Enum("pending", "processing", "completed", "failed", name="chat_status"), default="pending")
 
@@ -82,6 +83,7 @@ class AIResponse(Base):
 
   id = Column(Integer, primary_key=True, index=True)
   user_id = Column(Integer, ForeignKey("users.id")) 
+  query_id = Column(Integer, ForeignKey("user_chats.id"))
   response_from_ai = Column(String, nullable=False)
   time_responded = Column(DateTime)
 
@@ -93,7 +95,6 @@ class Notification(Base):
 
   id = Column(Integer, primary_key=True, index=True)
   user_id = Column(Integer, ForeignKey("users.id")) 
-  # status = Column(Boolean, nullable=False)
   status = Column(Enum("unread", "read", name="notification_status"), default="unread")
   message = Column(String, nullable=False)
   time_stamp = Column(DateTime)

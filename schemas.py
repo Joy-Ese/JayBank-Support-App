@@ -3,10 +3,6 @@ from pydantic import BaseModel, EmailStr
 class EncryptedRequest(BaseModel):
   encrypted_data: str
 
-# class ResponseModel(BaseModel):
-#   status: bool
-#   message: str
-
 class ChatRequest(BaseModel):
   user_query: str
 

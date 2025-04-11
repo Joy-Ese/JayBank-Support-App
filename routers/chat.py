@@ -19,16 +19,26 @@ def send_user_chat(
   ):
   print(db_user)
 
+  # Add user's chat to the db
+  new_user_chat = models.Chat(
+    user_id=db_user.id,
+    chat_from_user=query.user_query,
+    time_sent=datetime.utcnow(),
+  )
+  db.add(new_user_chat)
+  db.commit()
+  db.refresh(new_user_chat)
+
   # Check that user's credit balance is more than 0
   if db_user.credits_remaining <= 0:
     # Add to user's chat request to queue if no available credits
-    new_queue_entry = models.Queue(user_id=db_user.id, queries_submitted=query.user_query, status="pending")
+    new_queue_entry = models.Queue(user_id=db_user.id, query_id=new_user_chat.id, queries_submitted=query.user_query, status="pending")
     db.add(new_queue_entry)
     db.commit()
     db.refresh(new_queue_entry) 
     return {"message": "Insufficient credits. Your query is pending and has been queued."}
 
-  new_queue_entry = models.Queue(user_id=db_user.id, queries_submitted=query.user_query, status="processing")
+  new_queue_entry = models.Queue(user_id=db_user.id, query_id=new_user_chat.id, queries_submitted=query.user_query, status="processing")
   db.add(new_queue_entry)
   db.commit()
   db.refresh(new_queue_entry) 
@@ -42,21 +52,30 @@ def send_user_chat(
   # Update your Pydantic model if needed later
   db_user.credits_remaining = user_model.credits_remaining
 
-  # Add user's chat to the db
-  new_user_chat = models.Chat(
-    user_id=db_user.id,
-    chat_from_user=query.user_query,
-    time_sent=datetime.utcnow(),
-  )
-  db.add(new_user_chat)
-  db.commit()
-  db.refresh(new_user_chat)
-
   # process_queue(db, db_user)
   # Call process_queue asynchronously using BackgroundTasks
-  background_tasks.add_task(process_queue, db, db_user) 
+  background_tasks.add_task(process_queue, db, db_user, new_user_chat.id)
 
-  return {"message": "Your query is in the queue for processing."}
+  return {"message": "Your query is in the queue for processing.", "queryId": new_user_chat.id}
+
+@router.get("/query/status/{query_id}")
+async def get_query_status(query_id: int, db: Session = Depends(get_db)):
+  query = db.query(models.Queue).filter(models.Queue.query_id == query_id).first()
+  return {"status": query.status}
+
+@router.get("/ai_response/{query_id}")
+def get_ai_response(query_id: int, db: Session = Depends(get_db)):
+  response = db.query(models.AIResponse).filter(models.AIResponse.query_id == query_id).first()
+  if not response:
+    raise HTTPException(status_code=404, detail="No AI response found for this query")
+  
+  return {
+    "response": response.response_from_ai,
+    "time": response.time_responded,
+  }
+
+
+
 
 
 @router.get("/user-chats", dependencies=[Depends(get_current_user)])

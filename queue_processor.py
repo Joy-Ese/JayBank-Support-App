@@ -7,7 +7,7 @@ from database import get_db
 from mistral_integration import query_mistral
 from routers.user import get_user_details
 
-async def process_queue(db: Session = Depends(get_db), db_user: models.User = Depends(get_user_details)):
+async def process_queue(db: Session, db_user: models.User, query_id: int):
   while True:
     # Get user's pending or processing queries from the queue table
     pending_queries = db.query(models.Queue).filter(
@@ -31,6 +31,7 @@ async def process_queue(db: Session = Depends(get_db), db_user: models.User = De
       # Add AI response to the db
       new_AI_response = models.AIResponse(
         user_id=db_user.id,
+        query_id=query_id,
         response_from_ai=ai_response,
         time_responded=datetime.utcnow(),
       )
