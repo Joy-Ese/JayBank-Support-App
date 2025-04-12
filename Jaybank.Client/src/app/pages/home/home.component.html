@@ -1,10 +1,13 @@
 <div class="container mt-5">
   <div class="row">
     <div class="col-md-8 offset-md-2 text-center">
-      <h1 class="display-4" style="color: #DB7093;">Welcome to JB AI Support</h1>
-      <p class="lead">Revolutionizing Banking Support with Artificial Intelligence</p>
+      <h1 *ngIf="!isAuthenticated" class="display-4" style="color: #DB7093;">Welcome to JB AI Support</h1>
+      <h1 *ngIf="isAuthenticated" class="display-4" style="color: #DB7093;">Welcome {{ userDetails.username }}</h1>
+
+      <p *ngIf="!isAuthenticated" class="lead">Revolutionizing Banking Support with Artificial Intelligence</p>
+      <p *ngIf="isAuthenticated" class="lead">We hope you enjoy using JB AI for your virtual assistance.</p>
       
-      <div class="card-deck mt-4">
+      <div *ngIf="!isAuthenticated" class="card-deck mt-4">
         <div class="row">
           <div class="col-md-4 mb-4">
             <div class="card h-100">
@@ -32,9 +35,21 @@
           </div>
         </div>
       </div>
+
+      <div *ngIf="isAuthenticated">
+        <h6>
+          As a way to say thank you, we have given you 20 free credits on successful registration to use JB AI. 
+        </h6>
+        <h6>
+          You are currently on the <span>{{ userDetails.plan_subscribed_to }}</span> plan and you have <span>{{ userDetails.credits_remaining }}</span> number of credits remaining.
+        </h6>
+        <h6>
+          You can visit our <a class="priceLink" href="/pricing">pricing</a> page to upgrage your plan and purchase more credits.
+        </h6>
+      </div>
       
-      <div class="mt-4 mb-4">
-        <a href="/register" class="btn btn-primary btn-lg" style="background-color: #0066CC;">Get Started</a>
+      <div *ngIf="!isAuthenticated" class="mt-4 mb-4">
+        <a href="/register" class="btn btn-primary btn-lg">Get Started</a>
       </div>
     </div>
   </div>

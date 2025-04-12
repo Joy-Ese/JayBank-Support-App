@@ -22,20 +22,6 @@
 
       <div class="message-list">
         <div class="message-list">
-          <!-- <div *ngFor="let message of messages" class="message-wrapper" [ngClass]="{'user': message.chat_from_user, 'ai': message.response_from_ai}" [@messageAnimation]>
-            <div class="message-content">
-              <div *ngIf="message.chat_from_user" class="user-message">
-                <strong>You:</strong> {{ message.chat_from_user }}
-              </div>
-              <div *ngIf="message.response_from_ai" class="ai-message">
-                <strong>AI:</strong> {{ message.response_from_ai }}
-              </div>
-            </div>
-          </div> -->
-
-
-
-
           <div *ngFor="let message of messages" class="message-wrapper" [@messageAnimation]>
             <div class="user-message">
               <strong>You:</strong> {{ message.chat_from_user }}
