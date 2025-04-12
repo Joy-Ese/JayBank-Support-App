@@ -79,7 +79,9 @@ export class HeaderComponent implements OnInit, OnDestroy{
           console.log("Just checking if there's any new notification");
         },
         error: (err) => {
-          console.error("Failed to fetch notifications:", err);
+          if (this.userName) {
+            console.error("Failed to fetch notifications:", err);
+          }
         }
       });
     }, 10000); // every 10 seconds
@@ -93,8 +95,10 @@ export class HeaderComponent implements OnInit, OnDestroy{
         this.unreadNotificationsCount = response.total_unread
       },
       error: (error) => {
-        console.error('Error fetching notifications:', error);
-        this.hasUnread = false;
+        if (this.userName) {
+          console.error('Error fetching notifications:', error);
+          this.hasUnread = false;
+        }
       }
     });
   }

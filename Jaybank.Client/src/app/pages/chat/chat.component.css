@@ -71,20 +71,13 @@
   align-items: flex-start;
 }
 
-.message-content {
-  max-width: 70%;
-  padding: 10px;
-  border-radius: 10px;
-  word-wrap: break-word;
-  margin: 8px 0;
-}
-
 .user-message {
   background-color: #003366;
   color: white;
   padding: 10px;
   border-radius: 12px;
   margin-left: auto;
+  margin-bottom: 15px;
 }
 
 .ai-message {
@@ -92,6 +85,11 @@
   color: black;
   padding: 10px;
   border-radius: 12px;
+}
+
+.ai-message.thinking {
+  font-style: italic;
+  color: #DB7093;
 }
 
 .message-text {
@@ -112,36 +110,9 @@
 
 .message-input {
   flex-grow: 1;
-  margin-right: 15px;
+  margin-right: 20px;
 }
 
-.typing-indicator {
-  display: flex;
-  align-items: center;
-  margin-bottom: 15px;
-}
-
-.typing-dots {
-  display: flex;
-  margin-right: 10px;
-}
-
-.dot {
-  width: 8px;
-  height: 8px;
-  background-color: #DB7093;
-  border-radius: 50%;
-  margin: 0 4px;
-  animation: typing 1.4s infinite;
-}
-
-.dot:nth-child(2) {
-  animation-delay: 0.2s;
-}
-
-.dot:nth-child(3) {
-  animation-delay: 0.4s;
-}
 
 @keyframes typing {
   0%, 100% { opacity: 0.4; }
