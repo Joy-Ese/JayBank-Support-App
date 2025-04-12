@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, inject, OnInit, ViewChild } from '@angular/core';
 import { EndChatDialogComponent } from '../../reuseable-components/end-chat-dialog/end-chat-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { MatCardModule } from '@angular/material/card';
@@ -11,14 +11,16 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { ChatService } from '../../services/chat.service';
 import { AuthService } from '../../services/auth.service';
+import { ToastrService } from 'ngx-toastr';
 import { ChangeDetectorRef } from '@angular/core';
-import { forkJoin } from 'rxjs';
 
 interface ChatMessage {
-  chat_from_user?: string;  // User message
-  response_from_ai?: string; // AI response
-  time_sent?: string; // Only for user messages
-  time_responded?: string; // Only for AI messages
+  chat_from_user?: string;
+  response_from_ai?: string;
+  query_id?: number;
+  status?: 'pending' | 'processing' | 'completed';
+  time_sent?: string;
+  time_responded?: string;
 }
 
 @Component({
@@ -45,6 +47,7 @@ interface ChatMessage {
   styleUrl: './chat.component.css'
 })
 export class ChatComponent implements OnInit{
+  private toastr = inject(ToastrService);
 
   @ViewChild('chatContainer') chatContainer!: ElementRef;
 
@@ -71,15 +74,18 @@ export class ChatComponent implements OnInit{
 
   ngOnInit(): void {
     if (typeof window !== 'undefined' && localStorage) {
+      this.token = this.authService.getToken();
       this.userName = localStorage.getItem("userId");
+
+      this.greeting = this.getGreeting();
+      this.currentTimestamp = new Date();
+
+      this.scrollToBottom();
+
+      this.pollForResponses();
     } else {
       console.warn('localStorage is not available.');
     }
-    this.greeting = this.getGreeting();
-    this.currentTimestamp = new Date();
-
-    this.fetchAllChatHistory();
-    this.scrollToBottom();
   }
 
   getGreeting(): string {
@@ -93,62 +99,49 @@ export class ChatComponent implements OnInit{
     }
   }
 
-  fetchAllChatHistory(): void {
-    this.token = this.authService.getToken();
-
-    this.chatService.getUserChatHistory(this.token).subscribe(userChats => {
-      this.chatService.getAIChatHistory(this.token).subscribe(aiChats => {
-        
-        // Merge user and AI messages
-        this.messages = [...userChats, ...aiChats];
-
-        // Sort messages based on time (earliest first)
-        this.messages.sort((a, b) => {
-          const timeA = new Date(a.time_sent ?? a.time_responded ?? "").getTime();
-          const timeB = new Date(b.time_sent ?? b.time_responded ?? "").getTime();
-          return timeA - timeB;
-        });
-
-        // Force UI to update
-        this.cdRef.detectChanges();  // 👈 Add this line
-      });
-      console.log("Sorted chat history:", this.messages);
-    });
-  }
-
-  sendMessage() {
+  submitUserMessage() {
     if (!this.newMessage.trim()) return;
-
-    // Get token
-    this.token = this.authService.getToken();
-
-    // Add user message to UI
-    const userMessage: ChatMessage = {
+  
+    const chatMessage: ChatMessage = {
       chat_from_user: this.newMessage,
+      status: 'pending',
+      time_sent: new Date().toISOString()
     };
-
-    this.messages.push(userMessage);
+  
+    this.messages.push(chatMessage);
     this.scrollToBottom();
-    this.newMessage = "";
-
-    // Send message to backend
-    this.chatService.sendUserMessage(userMessage.chat_from_user ?? "", this.token)
-    .subscribe({
-      next: (res: any) => {
-        console.log(res);
-        const aiMessage: ChatMessage = {
-          response_from_ai: res.response || "No response received",
-        };
-
-        this.messages.push(aiMessage); // Add AI response to chat
-        this.typingIndicator = false;
-        this.scrollToBottom();
+  
+    this.chatService.submitUserQuestion(this.newMessage, this.token).subscribe({
+      next: (res) => {
+        chatMessage.query_id = res.queryId;
+        this.toastr.success(`${res.message}`);
       },
-      error: (error) => {
-        console.error("Error sending message:", error);
+      error: (err) => {
+        this.toastr.error("Failed to submit message");
+        console.error(err);
       }
     });
+  
+    this.newMessage = '';
+  }
 
+  pollForResponses(): void {
+    setInterval(() => {
+      const pendingMessages = this.messages.filter(m => m.query_id && (m.status === 'pending' || m.status === 'processing'));
+      pendingMessages.forEach(msg => {
+        this.chatService.getQueueStatus(msg.query_id!, this.token).subscribe(status => {
+          if (status === 'completed') {
+            this.chatService.getAIResponseByQueryId(msg.query_id!, this.token).subscribe(response => {
+              msg.response_from_ai = response.response;
+              msg.status = 'completed';
+              msg.time_responded = response.time.toISOString();
+              this.scrollToBottom();
+              this.toastr.info("AI has replied!");
+            });
+          }
+        });
+      });
+    }, 5000); // Polling every 5 seconds
   }
 
   scrollToBottom() {
@@ -160,7 +153,6 @@ export class ChatComponent implements OnInit{
     } catch(err) {}
   }
 
-
   endChat() {
     const dialogRef = this.dialog.open(EndChatDialogComponent, {
       width: '400px'
@@ -169,7 +161,8 @@ export class ChatComponent implements OnInit{
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.messages = [];
-        this.messages = [];
+        this.typingIndicator = false;
+        this.toastr.info("Chat ended. Welcome message retained.");
       }
     });
   }

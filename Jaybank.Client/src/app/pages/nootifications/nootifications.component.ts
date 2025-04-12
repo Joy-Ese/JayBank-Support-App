@@ -45,8 +45,8 @@ export class NootificationsComponent implements OnInit, OnDestroy{
   ) {}
 
   ngOnInit(): void {
-    this.token = this.authService.getToken();
     if (typeof window !== 'undefined' && localStorage) {
+      this.token = this.authService.getToken();
       // Subscribe to get the number of unread notifications
       this.notificationService.fetchUnreadNotificationsCount(this.token).subscribe({
         next: (response) => {

@@ -7,7 +7,7 @@
           <span>AI Support</span>
         </div>
         <button mat-mini-fab color="warn" (click)="endChat()" class="end-chat-btn">
-          <mat-icon>close</mat-icon>
+          End Chat
         </button>
       </div>
     </mat-card-header>
@@ -15,16 +15,14 @@
 
     <mat-card-content #chatContainer class="chat-messages">
       <div class="message-wrapper ai">
-        <div class="message-content">
-          <div class="message-text">
-            <strong>AI:</strong> {{ greeting }}, {{ userName || 'User' }}! I'm your AI Support assistant. How can I help you today?
-          </div>
+        <div class="message-text">
+          <strong>AI:</strong> {{ greeting }}, {{ userName || 'User' }}! I'm your AI Support assistant. How can I help you today?
         </div>
       </div>
 
       <div class="message-list">
         <div class="message-list">
-          <div *ngFor="let message of messages" class="message-wrapper" [ngClass]="{'user': message.chat_from_user, 'ai': message.response_from_ai}" [@messageAnimation]>
+          <!-- <div *ngFor="let message of messages" class="message-wrapper" [ngClass]="{'user': message.chat_from_user, 'ai': message.response_from_ai}" [@messageAnimation]>
             <div class="message-content">
               <div *ngIf="message.chat_from_user" class="user-message">
                 <strong>You:</strong> {{ message.chat_from_user }}
@@ -32,6 +30,25 @@
               <div *ngIf="message.response_from_ai" class="ai-message">
                 <strong>AI:</strong> {{ message.response_from_ai }}
               </div>
+            </div>
+          </div> -->
+
+
+
+
+          <div *ngFor="let message of messages" class="message-wrapper" [@messageAnimation]>
+            <div class="user-message">
+              <strong>You:</strong> {{ message.chat_from_user }}
+            </div>
+          
+            <!-- If AI hasn't replied -->
+            <div class="ai-message thinking" *ngIf="message.status === 'pending'">
+              <i><strong>AI:</strong> AI is thinking...</i>
+            </div>
+          
+            <!-- If AI has replied -->
+            <div class="ai-message" *ngIf="message.status === 'completed'">
+              <strong>AI:</strong> {{ message.response_from_ai }}
             </div>
           </div>
         </div>
@@ -44,14 +61,14 @@
         <input 
           matInput 
           [(ngModel)]="newMessage"
-          (keyup.enter)="sendMessage()"
+          (keyup.enter)="submitUserMessage()"
           placeholder="How can we help you today?"
         >
       </mat-form-field>
       <button 
         mat-fab 
         color="primary" 
-        (click)="sendMessage()"
+        (click)="submitUserMessage()"
         [disabled]="!newMessage.trim()">
         <mat-icon>send</mat-icon>
       </button>

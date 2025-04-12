@@ -52,7 +52,6 @@ def send_user_chat(
   # Update your Pydantic model if needed later
   db_user.credits_remaining = user_model.credits_remaining
 
-  # process_queue(db, db_user)
   # Call process_queue asynchronously using BackgroundTasks
   background_tasks.add_task(process_queue, db, db_user, new_user_chat.id)
 
