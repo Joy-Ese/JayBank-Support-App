@@ -31,6 +31,23 @@
   background-color: #003366;
 }
 
+.priceLink {
+  text-decoration: none;
+  color: #DB7093;
+}
+
+.priceLink:hover {
+  color: #003366;
+}
+
+h6 {
+  margin-bottom: 27px;
+}
+
+span {
+  color: #DB7093;
+}
+
 @media (max-width: 768px) {
   .card-deck .card {
     margin-bottom: 15px;
