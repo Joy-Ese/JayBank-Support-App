@@ -51,6 +51,7 @@ class CreditsTransaction(Base):
   plan_bought = Column(String, nullable=False)
   date_purchased = Column(DateTime)
   amount = Column(Float, nullable=False)
+  unique_transaction_reference = Column(String, nullable=False)
 
   user = relationship("User", back_populates="transactions")
 
