@@ -126,7 +126,6 @@ async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
       db.rollback()
       raise HTTPException(status_code=500, detail="Database transaction failed")
 
-
 # Implement verification of payement via session_id returned by the webhook
 @router.get("/verify-session")
 def verify_checkout_session(session_id: str, user: dict = Depends(get_current_user), db: Session = Depends(get_db)):
@@ -137,7 +136,6 @@ def verify_checkout_session(session_id: str, user: dict = Depends(get_current_us
   try:
     # Fetch the session from Stripe
     session = stripe.checkout.Session.retrieve(session_id)
-    payment_intent = stripe.PaymentIntent.retrieve(session.payment_intent)
 
     # Check payment status
     if session.payment_status != "paid":
@@ -174,17 +172,28 @@ def verify_checkout_session(session_id: str, user: dict = Depends(get_current_us
       user_id=db_user.id,
       plan_bought=db_plan.plan,
       amount=amount,
-      date_purchased=session.created,  # Stripe timestamp
+      date_purchased = datetime.fromtimestamp(session.created),  # Stripe timestamp
       unique_transaction_reference=session.metadata.get("reference")
     )
     db.add(new_transaction)
     db.commit()
 
+    # Save new notification
+    notification = models.Notification(
+      user_id=db_user.id,
+      message=f"You have successfully purchased {db_plan.credits} credits. You are now on the {db_plan.plan} Plan.",
+      status="unread",
+      time_stamp=datetime.utcnow()
+    )
+    db.add(notification)
+    db.commit()
+    db.refresh(notification)
+
     return {
-      "message": "Payment verified and user updated.",
+      "message": f"Payment verified and {db_plan.credits } credits added.",
       "payment_status": session.payment_status,
-      "plan": db_plan.credits,
-      "credits_added": db_plan.plan
+      "plan": db_plan.plan,
+      "credits_added": db_plan.credits,
     }
 
   except stripe.error.StripeError as e:
@@ -193,8 +202,19 @@ def verify_checkout_session(session_id: str, user: dict = Depends(get_current_us
     raise HTTPException(status_code=500, detail=f"Error verifying session: {str(e)}")
 
 
+# Get list of credits seeded to display in the frontend
+@router.get("/all-credits", dependencies=[Depends(get_current_user)])
+def get_all_credits(user: dict = Depends(get_current_user), db: Session = Depends(get_db)):
+  db_user = db.query(models.User).filter(models.User.id == user["id"]).first()
+  if not db_user:
+    raise HTTPException(status_code=404, detail="User not found")
 
+  # Exclude "Free" plan
+  all_credits = db.query(models.Credit).filter(models.Credit.plan != "Free").all()
 
+  return all_credits
+
+# Get credit balance for user
 @router.get("/balance", dependencies=[Depends(get_current_user)])
 def get_credit_balance(user: dict = Depends(get_current_user), db: Session = Depends(get_db)):
   db_user = db.query(models.User).filter(models.User.id == user["id"]).first()

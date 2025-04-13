@@ -50,8 +50,6 @@ export class HeaderComponent implements OnInit, OnDestroy{
 
       // Subscribe to keep polling for updated notifications
       this.startPolling();
-    } else {
-      console.warn('localStorage is not available.');
     }
   }
 

@@ -4,6 +4,7 @@ import { HeaderComponent } from './pages/header/header.component';
 import { FooterComponent } from './pages/footer/footer.component';
 import { CommonModule } from '@angular/common';
 import { LoaderService } from './services/loader.service';
+import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -19,9 +20,11 @@ import { LoaderService } from './services/loader.service';
 export class AppComponent {
   title = 'JayBank AI Support';
 
+  isAuthenticated: boolean = false;
+
   showLoader = true;
 
-  constructor(private loaderService: LoaderService) {
+  constructor(private loaderService: LoaderService, private authService: AuthService) {
     this.loaderService.loading$.subscribe((isLoading) => {
       if (isLoading) {
         this.showLoader = true;
@@ -33,4 +36,13 @@ export class AppComponent {
       }
     });
   }
+
+  ngOnInit() {
+    if (typeof window !== 'undefined' && localStorage) {
+      this.isAuthenticated = this.authService.isAuthenticated();
+    } else {
+      console.warn('localStorage is not available.');
+    }
+  }
+
 }
