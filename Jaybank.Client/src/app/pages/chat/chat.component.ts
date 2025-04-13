@@ -83,8 +83,6 @@ export class ChatComponent implements OnInit{
       this.scrollToBottom();
 
       this.pollForResponses();
-    } else {
-      console.warn('localStorage is not available.');
     }
   }
 

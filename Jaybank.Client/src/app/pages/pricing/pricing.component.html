@@ -2,49 +2,26 @@
   <div class="row">
     <div class="col-md-10 offset-md-1">
       <h2 class="text-center mb-4" style="color: #DB7093;">AI Support Credits Pricing</h2>
-      
+
+      <div *ngIf="!token" class="text-center my-5">
+        <i class="bi bi-bell text-muted mt-5" style="font-size: 3rem;"></i>
+        <p class="mt-5">Kindly register to JB AI Support to view our pricing options!</p>
+      </div>
+
       <div class="row">
-        <div class="col-md-4 mb-4">
+        <div class="col-md-4 mb-4" *ngFor="let item of plans">
           <div class="card text-center">
             <div class="card-body">
-              <h5 class="card-title">Starter Plan</h5>
-              <p class="h3 mb-3" style="color: #DB7093;">£9.99/month</p>
+              <h5 class="card-title">{{item.plan}} Plan</h5>
+              <p class="h3 mb-3" style="color: #DB7093;">£{{item.amount}}/month</p>
               <ul class="list-unstyled">
-                <li>50 AI Support Credits</li>
-                <li>Basic Query Resolution</li>
-                <li>Email Support</li>
+                <li *ngFor="let benefit of getBenefitsList(item.benefits)">
+                  {{ benefit }}
+                </li>
               </ul>
-              <a href="#" class="btn btn-primary" style="background-color: #DB7093;">Choose Plan</a>
-            </div>
-          </div>
-        </div>
-        
-        <div class="col-md-4 mb-4">
-          <div class="card text-center">
-            <div class="card-body">
-              <h5 class="card-title">Professional Plan</h5>
-              <p class="h3 mb-3" style="color: #DB7093;">£29.99/month</p>
-              <ul class="list-unstyled">
-                <li>200 AI Support Credits</li>
-                <li>Advanced Query Resolution</li>
-                <li>Priority Email & Chat Support</li>
-              </ul>
-              <a href="#" class="btn btn-primary" style="background-color: #DB7093;">Choose Plan</a>
-            </div>
-          </div>
-        </div>
-        
-        <div class="col-md-4 mb-4">
-          <div class="card text-center">
-            <div class="card-body">
-              <h5 class="card-title">Enterprise Plan</h5>
-              <p class="h3 mb-3" style="color: #DB7093;">£99.99/month</p>
-              <ul class="list-unstyled">
-                <li>Unlimited AI Support Credits</li>
-                <li>Complex Query Resolution</li>
-                <li>24/7 Dedicated Support Agents</li>
-              </ul>
-              <a href="#" class="btn btn-primary" style="background-color: #DB7093;">Choose Plan</a>
+              <button type="button" class="btn btn-primary" style="background-color: #DB7093;" (click)="onChoosePlan(item.plan)">
+                Choose Plan
+              </button>
             </div>
           </div>
         </div>

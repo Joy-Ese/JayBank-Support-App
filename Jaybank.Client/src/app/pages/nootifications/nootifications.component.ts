@@ -5,17 +5,6 @@ import { AuthService } from '../../services/auth.service';
 import { ToastrService } from 'ngx-toastr';
 import { CommonModule } from '@angular/common';
 
-interface Notification {
-  id: number;
-  message: string;
-  status: string;
-  time_stamp: Date;
-}
-
-interface UnreadNotificationResponse {
-  total_unread: number;
-}
-
 @Component({
   selector: 'app-nootifications',
   imports: [
@@ -62,8 +51,6 @@ export class NootificationsComponent implements OnInit, OnDestroy{
 
       // Subscribe to keep polling all notifications
       this.startPolling();
-    } else {
-      console.warn('localStorage is not available.');
     }
   }
 

@@ -8,12 +8,6 @@ export class AuthService {
 
   constructor(private router: Router) { }
 
-  // Check if user is logged in
-  isAuthenticated(): boolean {
-    const token = localStorage.getItem("token");
-    return !!token; // Returns true if token exists
-  }
-
   getToken(): string | null {
     if (typeof window !== 'undefined' && localStorage) {
       return localStorage.getItem("token"); // Retrieve token from localStorage
@@ -31,6 +25,11 @@ export class AuthService {
   // Keep token saved after login
   saveToken(token: string): void {
     localStorage.setItem("token", token);
+  }
+
+  // Check if user is logged in
+  isAuthenticated(): boolean {
+    return !!this.getToken(); // Returns true if token exists
   }
 
   isUser(): boolean {

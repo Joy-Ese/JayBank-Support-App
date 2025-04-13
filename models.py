@@ -51,6 +51,7 @@ class CreditsTransaction(Base):
   plan_bought = Column(String, nullable=False)
   date_purchased = Column(DateTime)
   amount = Column(Float, nullable=False)
+  unique_transaction_reference = Column(String, nullable=False)
 
   user = relationship("User", back_populates="transactions")
 
@@ -93,7 +94,7 @@ class AIResponse(Base):
 class Notification(Base):
   __tablename__ = "user_notifications"
 
-  id = Column(Integer, primary_key=True, index=True)
+  id = Column(Integer, primary_key=True, index=True, autoincrement=True)
   user_id = Column(Integer, ForeignKey("users.id")) 
   status = Column(Enum("unread", "read", name="notification_status"), default="unread")
   message = Column(String, nullable=False)
