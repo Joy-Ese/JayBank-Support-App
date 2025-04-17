@@ -17,6 +17,19 @@ def send_user_chat(
   db: Session = Depends(get_db), 
   db_user: models.User = Depends(get_user_details)
   ):
+  """
+    Sends a user query to the queue for processing.
+
+    Args:
+      query (str): The message input from the user.
+
+    Returns:
+      dict: {"message": "Your query is in the queue for processing.", "queryId": the query Id}
+
+    Raises:
+      ValueError: If the message is empty or invalid.
+    """
+
   print(db_user)
 
   # Add user's chat to the db

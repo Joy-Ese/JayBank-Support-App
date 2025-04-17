@@ -5,7 +5,13 @@ from models import Base
 from seed import seed_credits
 from routers import auth, chat, user, admin, credit, notification
 
-app = FastAPI(title="JayBank Support API")
+app = FastAPI(
+  title="JB Support API",
+  description="This API provides customer support about banking (financial institution) queries using AI models.",
+  version="1.0.0",
+  contact={"name": "Joy Eseosa Ihama", "email": "ihamajoyeseosa@gmail.com"},
+  license_info={"name": "MIT", "url": "https://opensource.org/licenses/MIT"}
+)
 
 origins = [
   "http://localhost:4200",

@@ -1,0 +1,41 @@
+/* JB AI Support - Custom Theme */
+
+body {
+  font-family: "Segoe UI", sans-serif;
+  background-color: white;
+  color: black;
+}
+
+h1, h2, h3, h4 {
+  color: #003366;
+}
+
+a {
+  color: #DB7093;
+}
+
+a:hover {
+  color: #003366;
+}
+
+.wy-side-nav-search {
+  background: #003366;
+}
+
+.wy-nav-side {
+  background: #003366;
+}
+
+.wy-nav-content {
+  background: white;
+  padding: 2em;
+}
+
+.rst-content .section ul li a {
+  color: #DB7093;
+}
+
+.rst-content .section ul li a:hover {
+  text-decoration: underline;
+  color: #003366;
+}
