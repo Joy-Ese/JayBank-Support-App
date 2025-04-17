@@ -8,6 +8,16 @@ from mistral_integration import query_mistral
 from routers.user import get_user_details
 
 async def process_queue(db: Session, db_user: models.User, query_id: int):
+  """
+  Processes a user's query to Mistral AI and adds it to the queue db updating the queue status after completion.
+
+  Args:
+    query_id (int): The query id from the db storing user's query.
+
+  Returns:
+    Runs every 60 seconds as a background task updating query status 
+  """
+
   while True:
     # Get user's pending or processing queries from the queue table
     pending_queries = db.query(models.Queue).filter(
@@ -41,7 +51,6 @@ async def process_queue(db: Session, db_user: models.User, query_id: int):
       db.refresh(new_AI_response)
 
       # Update query status to "completed" after processing
-      # Process each query and update database and USERRRRRR with MQTT and toastr when completed
       query.status = "completed"
       db.commit()
       db.refresh(query) 
