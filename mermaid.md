@@ -7,7 +7,6 @@ flowchart TD;
     FE -->|Register Login| BE
     FE -->|Chat Request| BE
     FE -->|Notification| BE
-    FE -->|Credit| BE
     BE -->|Buy Credit| Stripe
     BE -->|Validate User Credentials| Database[(PostgreSQL)]
     BE -->|Async Task| Queue
