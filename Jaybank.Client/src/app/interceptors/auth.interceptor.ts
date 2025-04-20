@@ -9,24 +9,40 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
   const toastr = inject(ToastrService);
 
+  const token = localStorage.getItem('token');
+
+  // Clone request to attach Authorization header if available
+  if (token) {
+    req = req.clone({
+      setHeaders: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+  }
+
   // return next(req).pipe(
   //   catchError((error) => {
-  //     if (error instanceof HttpErrorResponse && error.status === 401) {
+  //     // Only handle 401 errors when a user was previously logged in
+  //     if (error instanceof HttpErrorResponse && 
+  //         error.status === 401 && 
+  //         localStorage.getItem('token')) { // Only if token exists
 
-  //       // Check if localStorage is available
+  //       // Clear local storage
   //       if (typeof localStorage !== 'undefined') {
-  //         // Clear local storage
+  //         localStorage.removeItem("token");
+  //         localStorage.removeItem("loginResp");
+  //         localStorage.removeItem("userDetails");
   //         localStorage.clear();
   //       }
 
-  //       router.navigate(['/login']);
-
-  //       // Show toastr message
+  //       // Show only one toastr message
   //       toastr.warning('Your session has expired. Please sign in again.', 'Session Timeout');
 
   //       // Redirect to login page
-  //       // router.navigate(['/login']);
-  //       toastr.success('Youh have been logged out. Please log in again.', 'Success');
+  //       router.navigate(['/login']);
+  //       setTimeout(() => {
+  //         window.location.reload();
+  //       }, 300);
   //     }
 
   //     return throwError(() => error);
@@ -35,30 +51,35 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((error) => {
-      // Only handle 401 errors when a user was previously logged in
-      if (error instanceof HttpErrorResponse && 
-          error.status === 401 && 
-          localStorage.getItem('token')) { // Only if token exists
+      const currentUrl = router.url;
+      const isLoginPage = currentUrl.includes('/login') || currentUrl.includes('/register');
 
-        // Clear local storage
-        if (typeof localStorage !== 'undefined') {
-          localStorage.removeItem("token");
-          localStorage.removeItem("loginResp");
-          localStorage.removeItem("userDetails");
-          localStorage.clear();
-        }
+      // list of polling endpoints to ignore from logout
+      const pollingEndpoints = ['/chat/ai_response', '/notification'];
+      const isPolling = pollingEndpoints.some(endpoint => req.url.includes(endpoint));
 
-        // Show only one toastr message
+      if (
+        error instanceof HttpErrorResponse &&
+        error.status === 401 &&
+        !isPolling && // Don't logout if it's a polling URL
+        token &&
+        !isLoginPage
+      ) {
+        // Clear sensitive data
+        localStorage.removeItem("token");
+        localStorage.removeItem("loginResp");
+        localStorage.removeItem("userDetails");
+        localStorage.clear();
+
         toastr.warning('Your session has expired. Please sign in again.', 'Session Timeout');
 
-        // Redirect to login page
+        // Redirect and refresh
         router.navigate(['/login']);
-        setTimeout(() => {
-          window.location.reload();
-        }, 300);
+        setTimeout(() => window.location.reload(), 300);
       }
 
       return throwError(() => error);
     })
   );
+
 };

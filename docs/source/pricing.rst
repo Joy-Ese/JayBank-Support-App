@@ -8,15 +8,10 @@ Each interaction with the assistant deducts a specific amount of credit per quer
 Credit Tiers
 ------------
 
-+------------------+-------------+-----------------------------+
-| Plan             | Price (£)   | Credits Included            |
-+==================+=============+=============================+
-| Starter          | 9.99        | 50 credits                  |
-+------------------+-------------+-----------------------------+
-| Professional     | 29.99       | 200 credits (100 free!)     |
-+------------------+-------------+-----------------------------+
-| Enterprise       | 99.99       | 5000 credits (1000 free!)   |
-+------------------+-------------+-----------------------------+
+Plan          -   Price (£)     - Credits Included 
+Starter       -   9.99          - 50
+Professional  -   29.99         - 200 (100 free!)
+Enterprise    -   99.99         - 5000 (1000 free!)
 
 How to Purchase Credits
 ------------------------

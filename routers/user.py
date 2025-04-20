@@ -9,6 +9,13 @@ router = APIRouter()
 
 @router.get("/details", response_model=schemas.UserResponse, dependencies=[Depends(get_current_user)])
 def get_user_details(user: dict = Depends(get_current_user), db: Session = Depends(get_db)):
+  """
+  Gets details of authenticated user.
+
+  Returns:
+    dict: User's information stored in the database.
+  """
+
   db_user = db.query(models.User).filter(models.User.id == user["id"]).first()
   if not db_user:
     raise HTTPException(status_code=404, detail="User not found")

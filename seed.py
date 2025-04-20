@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 import models
 
 def seed_credits(db: Session):
-  """Check if the Credits table is empty and seed default plans."""
+  """Check if the Credits table in the database is empty and seed default plans."""
   default_plans = [
     {
       "plan": "Free", 

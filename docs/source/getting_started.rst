@@ -1,7 +1,7 @@
 Getting Started
 ===============
 
-Welcome to JB AI Support 🎉 — an intelligent, secure, and cloud-based support system tailored for banks and financial institutions.
+Welcome to JB AI Support — an intelligent, secure, and cloud-based support system tailored for banks and financial institutions.
 
 Your virtual assistant for all your banking queries.
 
@@ -24,4 +24,3 @@ Requirements
 
 Next Steps:
 - Read our :doc:`pricing` guide
-- Learn how the :doc:`queue_processor` works

@@ -21,14 +21,14 @@ def send_user_chat(
     Sends a user query to the queue for processing.
 
     Args:
-      query (str): The message input from the user.
+      ChatRequest (dict): {"user_query": str}
 
     Returns:
       dict: {"message": "Your query is in the queue for processing.", "queryId": the query Id}
 
     Raises:
       ValueError: If the message is empty or invalid.
-    """
+  """
 
   print(db_user)
 
@@ -72,11 +72,31 @@ def send_user_chat(
 
 @router.get("/query/status/{query_id}")
 async def get_query_status(query_id: int, db: Session = Depends(get_db)):
+  """
+    Fetches query status in the queue for frontend polling.
+
+    Args:
+      query_id: int
+
+    Returns:
+      dict: {"status": query.status}
+  """
+
   query = db.query(models.Queue).filter(models.Queue.query_id == query_id).first()
   return {"status": query.status}
 
 @router.get("/ai_response/{query_id}")
 def get_ai_response(query_id: int, db: Session = Depends(get_db)):
+  """
+    Fetches AI Response corresponding to the query id.
+
+    Args:
+      query_id: int
+
+    Returns:
+      dict: {"response": response_from_ai, "time": time_responded}
+  """
+
   response = db.query(models.AIResponse).filter(models.AIResponse.query_id == query_id).first()
   if not response:
     raise HTTPException(status_code=404, detail="No AI response found for this query")
@@ -87,11 +107,24 @@ def get_ai_response(query_id: int, db: Session = Depends(get_db)):
   }
 
 
-
-
-
 @router.get("/user-chats", dependencies=[Depends(get_current_user)])
 def fetch_user_chats(db: Session = Depends(get_db), db_user: models.User = Depends(get_user_details)):
+  """
+  Gets list of all chats for the logged-in user.
+
+  Returns:
+    list: A list of Chat dictionaries.
+
+  Example:
+    Sample JSON:
+      {
+        "id": int,
+        "user_id": int,
+        "chat_from_user": str,
+        "time_sent": datetime
+      }
+  """
+
   user_chats = (
     db.query(models.Chat)
     .filter(models.Chat.user_id == db_user.id)
@@ -105,6 +138,23 @@ def fetch_user_chats(db: Session = Depends(get_db), db_user: models.User = Depen
 
 @router.get("/ai-responses", dependencies=[Depends(get_current_user)])
 def fetch_ai_responses(db: Session = Depends(get_db), db_user: models.User = Depends(get_user_details)):
+  """
+  Gets list of all AI responses for the user logged in.
+
+  Returns:
+    list: A list of AI Response dictionaries.
+
+  Example:
+    Sample JSON:
+      {
+        "id": int,
+        "user_id": int,
+        "query_id": int,
+        "response_from_ai": str,
+        "time_responded": datetime
+      }
+  """
+
   ai_responses = (
     db.query(models.AIResponse)
     .filter(models.AIResponse.user_id == db_user.id)
