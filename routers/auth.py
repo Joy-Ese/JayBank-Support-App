@@ -15,7 +15,36 @@ router = APIRouter()
 
 security = HTTPBearer()
 
-@router.post("/register")
+@router.post(
+    "/register",
+    summary="Register a new user with encrypted details",
+    description="""
+      Sends user's details as an encrypted string for registeration.
+
+      **Sample decrypted user JSON**:
+      ```json
+      {
+        "first_name": "Jane",
+        "last_name": "Doe",
+        "username": "janedoe",
+        "email": "jane.doe@example.com",
+        "password": "strongpassword123",
+      }
+
+      Args:
+        CreateUser (dict): User details.
+
+      Returns:
+        dict: {"data": encrypted_response}.
+
+      **Sample decrypted response JSON**:
+      ```json
+      {
+        "status": True, 
+        "message": "Registration successful"
+      }
+    """
+  )
 def register(encrypted_request: schemas.EncryptedRequest, db: Session = Depends(get_db)):
   try:
     # Decrypt request data
@@ -64,7 +93,33 @@ def register(encrypted_request: schemas.EncryptedRequest, db: Session = Depends(
   encrypted_response = encrypt_data(json.dumps({"status": True, "message": "Registration successful"}))
   return {"data": encrypted_response}
 
-@router.post("/login")
+@router.post(
+    "/login",
+    summary="Authenticate user",
+    description="""
+      Sends user's details as an encrypted string to authenticated.
+
+      **Sample decrypted user JSON**:
+      ```json
+      {
+        "username": "janedoe",
+        "password": "strongpassword123",
+      }
+
+      Args:
+        UserLogin (dict): login details.
+
+      Returns:
+        dict: {"data": encrypted_response}.
+
+      **Sample decrypted response JSON**:
+      ```json
+      {
+        "access_token": token, 
+        "role": role
+      }
+    """
+  )
 def login(encrypted_request: schemas.EncryptedRequest, db: Session = Depends(get_db)):
   try:
     # Decrypt request data
@@ -94,7 +149,6 @@ def login(encrypted_request: schemas.EncryptedRequest, db: Session = Depends(get
 
   # If not found in User, check Admin table
   db_admin = db.query(models.Admin).filter(models.Admin.username == credentials.username).first()
-  # if db_admin and verify_password(credentials.password, db_admin.hashed_password):
   if db_admin:
     role = db_admin.role
     # Generate JWT token for Admin
@@ -107,8 +161,14 @@ def login(encrypted_request: schemas.EncryptedRequest, db: Session = Depends(get
   raise HTTPException(status_code=400, detail="Invalid credentials")
 
 
-
 def get_current_user(credentials: HTTPAuthorizationCredentials = Security(security), db: Session = Depends(get_db)):
+  """
+  Gets User's credentials from HTTP Authorization Credentials to allow access to protected endpoints.
+
+  Returns:
+    dict: {"id": int, "role": "str"}.
+  """
+
   token = credentials.credentials
   decoded_token = verify_token(token)
   user = db.query(models.User).filter(models.User.username == decoded_token["username"]).first()
@@ -119,6 +179,13 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Security(securi
   return {"id": user.id, "role": user.role}
 
 def get_current_admin(credentials: HTTPAuthorizationCredentials = Security(security), db: Session = Depends(get_db)):
+  """
+  Gets Admin's credentials from HTTP Authorization Credentials to allow access to protected endpoints.
+
+  Returns:
+    dict: {"id": int, "role": "str"}.
+  """
+
   token = credentials.credentials
   decoded_token = verify_token(token)
   admin = db.query(models.Admin).filter(models.Admin.username == decoded_token["username"]).first()
@@ -130,6 +197,13 @@ def get_current_admin(credentials: HTTPAuthorizationCredentials = Security(secur
 
 def role_required(required_role: str):
   def role_checker(user: dict = Depends(get_current_user)):
+    """
+    Checks that role is user before granting access.
+
+    Returns:
+      dict: {"id": int, "role": "str"}.
+    """
+
     if user["role"] != required_role:
       raise HTTPException(status_code=403, detail="Access forbidden")
     return user
@@ -137,6 +211,13 @@ def role_required(required_role: str):
 
 def admin_role_required(required_role: str):
   def admin_role_checker(admin: dict = Depends(get_current_admin)):
+    """
+    Checks that role is admin before granting access.
+
+    Returns:
+      dict: {"id": int, "role": "str"}.
+    """
+
     if admin["role"] != required_role:
       raise HTTPException(status_code=403, detail="Access forbidden")
     return admin

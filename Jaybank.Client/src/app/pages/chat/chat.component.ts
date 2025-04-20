@@ -132,7 +132,7 @@ export class ChatComponent implements OnInit{
             this.chatService.getAIResponseByQueryId(msg.query_id!, this.token).subscribe(response => {
               msg.response_from_ai = response.response;
               msg.status = 'completed';
-              msg.time_responded = response.time.toISOString();
+              // msg.time_responded = response.time.toISOString();
               this.scrollToBottom();
               this.toastr.info("AI has replied!");
             });

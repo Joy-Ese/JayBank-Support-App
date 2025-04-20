@@ -62,26 +62,22 @@ export class LoginComponent implements OnInit{
         localStorage.setItem("role", decryptedResponseObject.role);
 
         if (decryptedResponseObject.role === "User") {
-          const headers2 = new HttpHeaders({
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${decryptedResponseObject.access_token}`
-          });
-
-          this.http.get<any>(`${this.baseUrl}/user/details`, {headers: headers2})
+          this.http.get<any>(`${this.baseUrl}/user/details`,
+          {
+            headers: new HttpHeaders({
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${decryptedResponseObject.access_token}`
+            })
+          })
           .subscribe({
             next: (res) => {
               localStorage.setItem("userDetails", JSON.stringify(res));
               localStorage.setItem("userId", res.username);
-              if (this.authService.isAuthenticated() && this.authService.isUser()) {
-                setTimeout(() => {
-                  this.loaderService.disable();
-                  this.router.navigate(['/chat']).then(() => {
-                    location.reload();
-                    this.loaderService.enable();
-                  });
-                }, 1000);
-              }
-              this.router.navigate(['/login']);
+              // Navigate only after setting all
+              this.router.navigate(['/chat']).then(() => {
+                // Reload to re-trigger app state / auth guards
+                window.location.reload();
+              });
             },
             error: (err) => {
               console.log(err);
@@ -90,26 +86,20 @@ export class LoginComponent implements OnInit{
         }
 
         if (decryptedResponseObject.role === "Admin" && this.authService.isAdmin()) {
-          const headers3 = new HttpHeaders({
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${decryptedResponseObject.access_token}`
-          });
-
-          this.http.get<any>(`${this.baseUrl}/admin/details`, {headers: headers3})
+          this.http.get<any>(`${this.baseUrl}/admin/details`, 
+          {
+            headers: new HttpHeaders({
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${decryptedResponseObject.access_token}`
+            })
+          })
           .subscribe({
             next: (res) => {
               localStorage.setItem("userDetails", JSON.stringify(res));
               localStorage.setItem("userId", res.username);
-              if (this.authService.isAuthenticated()) {
-                setTimeout(() => {
-                  this.loaderService.disable();
-                  this.router.navigate(['/dashboard']).then(() => {
-                    location.reload();
-                    this.loaderService.enable();
-                  });
-                }, 1000);
-              }
-              this.router.navigate(['/login']);
+              this.router.navigate(['/dashboard']).then(() => {
+                window.location.reload();
+              });
             },
             error: (err) => {
               console.log(err);

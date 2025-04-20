@@ -19,6 +19,16 @@ endpoint_secret = "whsec_VC1rKFHRWL84dvtHmVChPFYbAZirDMAq"
 # Implement initialization of checkout for stripe payment
 @router.post("/create-checkout-session")
 def create_checkout_session(plan: str, user: dict = Depends(get_current_user), db: Session = Depends(get_db)):
+  """
+  Initialize Stripe Payment
+
+  Args:
+    plan: str
+
+  Returns:
+    dict: {"checkout_url": str}
+  """
+
   db_user = db.query(models.User).filter(models.User.id == user["id"]).first()
   if not db_user:
     raise HTTPException(status_code=404, detail="User not found")
@@ -61,7 +71,7 @@ def create_checkout_session(plan: str, user: dict = Depends(get_current_user), d
 # Generate a unique reference string to prevent duplicate transactions
 def reference_generator():
   """
-  Generate a reference string
+  Generate a unique reference string to check for duplicate successful payments
   Takes a UUID, removes hyphens, and returns a 15-character substring.
   """
   # Generate a UUID, convert to string, remove hyphens, and take a 15-character substring
@@ -71,6 +81,11 @@ def reference_generator():
 # Implement webhook to get successful or failed response from stripe 
 @router.post("/stripe/webhook")
 async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
+  """
+  Stripe webhook for deployment to production. 
+  Would have to register prod domain name on Stripe's portal.
+  """
+
   payload = await request.body()
   sig_header = request.headers.get("stripe-signature")
 
@@ -127,8 +142,18 @@ async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
       raise HTTPException(status_code=500, detail="Database transaction failed")
 
 # Implement verification of payement via session_id returned by the webhook
-@router.get("/verify-session")
+@router.get("/verify-session", response_model=schemas.VerifyStripe)
 def verify_checkout_session(session_id: str, user: dict = Depends(get_current_user), db: Session = Depends(get_db)):
+  """
+  Verify Stripe Payment using Stripe's generated session ID
+
+  Args:
+    session_id: str
+
+  Returns:
+    dict: {"checkout_url": str}
+  """
+
   db_user = db.query(models.User).filter(models.User.id == user["id"]).first()
   if not db_user:
     raise HTTPException(status_code=404, detail="User not found")
@@ -189,12 +214,18 @@ def verify_checkout_session(session_id: str, user: dict = Depends(get_current_us
     db.commit()
     db.refresh(notification)
 
-    return {
-      "message": f"Payment verified and {db_plan.credits } credits added.",
-      "payment_status": session.payment_status,
-      "plan": db_plan.plan,
-      "credits_added": db_plan.credits,
-    }
+    # return {
+    #   "message": f"Payment verified and {db_plan.credits } credits added.",
+    #   "payment_status": session.payment_status,
+    #   "plan": db_plan.plan,
+    #   "credits_added": db_plan.credits,
+    # }
+    return schemas.VerifyStripe(
+      message=f"Payment verified and {db_plan.credits } credits added.",
+      payment_status=session.payment_status,
+      plan=db_plan.plan,
+      credits_added=db_plan.credits
+    )
 
   except stripe.error.StripeError as e:
     raise HTTPException(status_code=500, detail=f"Stripe error: {str(e)}")
@@ -205,6 +236,22 @@ def verify_checkout_session(session_id: str, user: dict = Depends(get_current_us
 # Get list of credits seeded to display in the frontend
 @router.get("/all-credits", dependencies=[Depends(get_current_user)])
 def get_all_credits(user: dict = Depends(get_current_user), db: Session = Depends(get_db)):
+  """
+  Gets list of credits seeded into the database
+
+  Returns:
+  list: Credit{dict}
+    [
+      {
+        id: int,
+        plan: str,
+        amount: float,
+        benefits: str,
+        credits: int
+      }
+    ]
+  """
+
   db_user = db.query(models.User).filter(models.User.id == user["id"]).first()
   if not db_user:
     raise HTTPException(status_code=404, detail="User not found")
@@ -215,8 +262,15 @@ def get_all_credits(user: dict = Depends(get_current_user), db: Session = Depend
   return all_credits
 
 # Get credit balance for user
-@router.get("/balance", dependencies=[Depends(get_current_user)])
+@router.get("/balance", response_model=schemas.CreditBalance, dependencies=[Depends(get_current_user)])
 def get_credit_balance(user: dict = Depends(get_current_user), db: Session = Depends(get_db)):
+  """
+  Gets user's credit balance for frontend polling to send a notification when credit balance gets to 10.
+
+  Returns:
+    int: credit balance.
+  """
+
   db_user = db.query(models.User).filter(models.User.id == user["id"]).first()
   if not db_user:
     raise HTTPException(status_code=404, detail="User not found")
@@ -232,5 +286,7 @@ def get_credit_balance(user: dict = Depends(get_current_user), db: Session = Dep
     db.commit()
     db.refresh(notification)
 
-  return {"credits": db_user.credits_remaining}
+  return schemas.CreditBalance(
+    credits=db_user.credits_remaining
+  )
 
