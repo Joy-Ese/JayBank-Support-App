@@ -234,7 +234,7 @@ def verify_checkout_session(session_id: str, user: dict = Depends(get_current_us
 
 
 # Get list of credits seeded to display in the frontend
-@router.get("/all-credits", dependencies=[Depends(get_current_user)])
+@router.get("/all-credits", response_model=list[schemas.AllCredits], dependencies=[Depends(get_current_user)])
 def get_all_credits(user: dict = Depends(get_current_user), db: Session = Depends(get_db)):
   """
   Gets list of credits seeded into the database

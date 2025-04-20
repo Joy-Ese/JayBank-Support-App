@@ -1,40 +1,24 @@
 <div class="dashboard-container mt-3">
+  <div class="row mx-2">
+    <div class="d-flex justify-content-between">
+      <div class="aesth">Username: {{ adminDetails.username }}</div>
+      <div class="aesth">Email: {{ adminDetails.email }}</div>
+      <div class="aesth">Role:{{ adminDetails.role }}</div>
+    </div>
+  </div>
+
   <mat-card class="dashboard-card">
     <mat-card-header>
       <mat-card-title>Admin Dashboard</mat-card-title>
     </mat-card-header>
     
     <mat-card-content>
-      <div class="row">
-        <div class="col-md-6">
-          <mat-card>
-            <mat-card-header>
-              <mat-card-title>User Statistics</mat-card-title>
-            </mat-card-header>
-            <mat-card-content>
-              <canvas id="userChart"></canvas>
-            </mat-card-content>
-          </mat-card>
-        </div>
-        
-        <div class="col-md-6">
-          <mat-card>
-            <mat-card-header>
-              <mat-card-title>Credit Distribution</mat-card-title>
-            </mat-card-header>
-            <mat-card-content>
-              <canvas id="creditChart"></canvas>
-            </mat-card-content>
-          </mat-card>
-        </div>
-      </div>
-
       <mat-card class="mt-4">
         <mat-card-header>
-          <mat-card-title>User Details</mat-card-title>
+          <mat-card-title>User Statistics</mat-card-title>
         </mat-card-header>
         <mat-card-content>
-          <mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+          <mat-table *ngIf="dataSource" [dataSource]="dataSource" class="mat-elevation-z8">
             <!-- Metric Column -->
             <ng-container matColumnDef="metric">
               <mat-header-cell *matHeaderCellDef> Metric </mat-header-cell>

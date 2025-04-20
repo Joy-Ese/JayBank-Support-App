@@ -2,6 +2,13 @@ from pydantic import BaseModel, EmailStr, Field
 from datetime import datetime
 from enum import Enum
 
+class AllCredits(BaseModel):
+  id: int
+  plan: str
+  amount: float
+  benefits: str
+  credits: int
+
 class MarkAsRead(BaseModel):
   message: str
 
