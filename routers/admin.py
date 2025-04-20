@@ -54,7 +54,6 @@ def create_admin(admin: schemas.CreateAdmin, db: Session = Depends(get_db)):
   db.commit()
   db.refresh(new_admin)
 
-  # return {"status": True, "message": "Admin created successfully"}
   return schemas.ResponseModel(
     status=True,
     message="Admin created successfully"
@@ -71,14 +70,8 @@ def get_admin_details(admin: dict = Depends(get_current_admin), db: Session = De
 
   db_admin = db.query(models.Admin).filter(models.Admin.id == admin["id"]).first()
   if not db_admin:
-    raise HTTPException(status_code=404, detail="User not found")
-  
-  # return {
-  #   "id": db_admin.id,
-  #   "username": db_admin.username,
-  #   "email": db_admin.email,
-  #   "role": db_admin.role
-  # }
+    raise HTTPException(status_code=404, detail="Admin not found")
+
   return schemas.AdminResponse(
     id=db_admin.id,
     username=db_admin.username,
@@ -86,8 +79,7 @@ def get_admin_details(admin: dict = Depends(get_current_admin), db: Session = De
     role=db_admin.role
   )
 
-
-# Get Total Number of Users (Admin Only)
+# Get Total Number of Users
 @router.get("/total-users", response_model=schemas.TotalUsers, dependencies=[Depends(get_current_admin)])
 def get_total_users(admin: dict = Depends(get_current_admin), db: Session = Depends(get_db)):
   """
@@ -97,10 +89,58 @@ def get_total_users(admin: dict = Depends(get_current_admin), db: Session = Depe
     int: Count of registered users.
   """
 
+  db_admin = db.query(models.Admin).filter(models.Admin.id == admin["id"]).first()
+  if not db_admin:
+    raise HTTPException(status_code=404, detail="Admin not found")
+
   total_users = db.query(models.User).count()
-  # return {"total_users": total_users}
+
   return schemas.TotalUsers(
     total_users=total_users
+  )
+
+# Get Users with Low Credits 
+@router.get("/users-low-credits", response_model=schemas.TotalUsers, dependencies=[Depends(get_current_admin)])
+def get_users_low_credits(admin: dict = Depends(get_current_admin), db: Session = Depends(get_db)):
+  """
+  Gets all users with 10 or fewer credits remaining.
+
+  Returns:
+    int: Count users with low credits.
+  """
+
+  db_admin = db.query(models.Admin).filter(models.Admin.id == admin["id"]).first()
+  if not db_admin:
+    raise HTTPException(status_code=404, detail="Admin not found")
+
+  users_low_credits = db.query(models.User).filter(models.User.credits_remaining <= 10).count()
+
+  return schemas.TotalUsers(
+    total_users=users_low_credits
+  )
+
+# Get Users Who Have Purchased Credits
+@router.get("/users-purchased-credits", response_model=schemas.TotalUsers, dependencies=[Depends(get_current_admin)])
+def get_users_purchased_credits(admin: dict = Depends(get_current_admin), db: Session = Depends(get_db)):
+  """
+  Gets the count of users who have purchased credits.
+
+  Returns:
+    int: Count of unique users who have at least one credit transaction.
+  """
+
+  db_admin = db.query(models.Admin).filter(models.Admin.id == admin["id"]).first()
+  if not db_admin:
+    raise HTTPException(status_code=404, detail="Admin not found")
+
+  user_ids_with_credits = (
+    db.query(models.CreditsTransaction.user_id)
+    .distinct()
+    .count()
+  )
+
+  return schemas.TotalUsers(
+    total_users=user_ids_with_credits
   )
 
 

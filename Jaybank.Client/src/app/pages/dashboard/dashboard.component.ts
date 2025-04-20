@@ -1,14 +1,27 @@
-import { AfterViewInit, Component, ViewChild } from '@angular/core';
-import { Chart } from 'chart.js/auto';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../services/auth.service';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { forkJoin } from 'rxjs';
+
+interface AdminDetails {
+  id: number;
+  username: string;
+  email: string;
+  role: string;
+}
 
 interface UserStatistic {
   metric: string;
   count: number;
   percentage: number;
+}
+
+interface TotalUsers {
+  total_users: number;
 }
 
 @Component({
@@ -22,17 +35,17 @@ interface UserStatistic {
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
-export class DashboardComponent implements AfterViewInit  {
+export class DashboardComponent implements OnInit{
+  baseUrl : string = "http://127.0.0.1:8000";
+
+  token: string | null = null;
+
+  adminDetails: AdminDetails = {} as AdminDetails;
 
   // User statistics
-  totalUsers = 1024;
-  purchasedCreditUsers = 456;
-  lowCreditUsers = 78;
-  activeChats = 24;
-
-  // Chart references
-  userChart!: Chart;
-  creditChart!: Chart;
+  totalUsers!: number;
+  purchasedCreditUsers!: number;
+  lowCreditUsers!: number;
 
   // Table data
   displayedColumns: string[] = ['metric', 'count', 'percentage'];
@@ -40,12 +53,18 @@ export class DashboardComponent implements AfterViewInit  {
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-  constructor() {}
+  constructor(
+    private authService: AuthService,
+    private http: HttpClient
+  ) {}
 
-  ngAfterViewInit(): void {
-    this.initializeTableData();
-    // this.createUserChart();
-    // this.createCreditChart();
+  ngOnInit(): void {
+    if (typeof window !== 'undefined' && localStorage) {
+      this.token = this.authService.getToken();
+
+      this.getAllUserStats(); // use forkJoin to wait for all responses
+      this.getAdminDetails();
+    }
   }
 
   initializeTableData() {
@@ -64,11 +83,6 @@ export class DashboardComponent implements AfterViewInit  {
         metric: 'Users with Low Credits',
         count: this.lowCreditUsers,
         percentage: (this.lowCreditUsers / this.totalUsers) * 100
-      },
-      {
-        metric: 'Active Chats',
-        count: this.activeChats,
-        percentage: (this.activeChats / this.totalUsers) * 100
       }
     ];
 
@@ -76,51 +90,45 @@ export class DashboardComponent implements AfterViewInit  {
     this.dataSource.paginator = this.paginator;
   }
 
-  // createUserChart() {
-  //   const ctx = document.getElementById('userChart') as HTMLCanvasElement;
-  //   this.userChart = new Chart(ctx, {
-  //     type: 'pie',
-  //     data: {
-  //       labels: ['Total Users', 'Purchased Credit Users', 'Low Credit Users', 'Active Chats'],
-  //       datasets: [{
-  //         data: [this.totalUsers, this.purchasedCreditUsers, this.lowCreditUsers, this.activeChats],
-  //         backgroundColor: ['#DB7093', '#003366', '#6699CC', '#336699']
-  //       }]
-  //     },
-  //     options: {
-  //       responsive: true,
-  //       plugins: {
-  //         title: {
-  //           display: true,
-  //           text: 'User Statistics'
-  //         }
-  //       }
-  //     }
-  //   });
-  // }
+  getAllUserStats() {
+    const headers = new HttpHeaders({
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${this.token}`
+    });
+  
+    const totalUsers$ = this.http.get<TotalUsers>(`${this.baseUrl}/admin/total-users`, { headers });
+    const purchasedCreditUsers$ = this.http.get<TotalUsers>(`${this.baseUrl}/admin/users-purchased-credits`, { headers });
+    const lowCreditUsers$ = this.http.get<TotalUsers>(`${this.baseUrl}/admin/users-low-credits`, { headers });
+  
+    forkJoin([totalUsers$, purchasedCreditUsers$, lowCreditUsers$]).subscribe({
+      next: ([total, purchased, low]) => {
+        this.totalUsers = total.total_users;
+        this.purchasedCreditUsers = purchased.total_users;
+        this.lowCreditUsers = low.total_users;
+  
+        this.initializeTableData();
+      },
+      error: (err) => console.log(err)
+    });
+  }
 
-  // createCreditChart() {
-  //   const ctx = document.getElementById('creditChart') as HTMLCanvasElement;
-  //   this.creditChart = new Chart(ctx, {
-  //     type: 'bar',
-  //     data: {
-  //       labels: ['Total Users', 'Purchased Credit Users', 'Low Credit Users'],
-  //       datasets: [{
-  //         label: 'User Credit Distribution',
-  //         data: [this.totalUsers, this.purchasedCreditUsers, this.lowCreditUsers],
-  //         backgroundColor: ['#DB7093', '#003366', '#6699CC']
-  //       }]
-  //     },
-  //     options: {
-  //       responsive: true,
-  //       plugins: {
-  //         title: {
-  //           display: true,
-  //           text: 'Credit Distribution'
-  //         }
-  //       }
-  //     }
-  //   });
-  // }
+  getAdminDetails() {
+    const headers = new HttpHeaders({
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${this.token}`
+    });
+
+    this.http.get<any>(`${this.baseUrl}/admin/details`, {headers: headers})
+    .subscribe({
+      next: (res) => {
+        console.log(res);
+        this.adminDetails = res;
+        localStorage.setItem("adminDetails", JSON.stringify(res));
+      },
+      error: (err) => {
+        console.log(err);
+      }
+    });
+  }
 
 }

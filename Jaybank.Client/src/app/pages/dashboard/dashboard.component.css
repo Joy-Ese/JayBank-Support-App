@@ -33,3 +33,11 @@
 .mat-row:nth-child(odd) {
   background-color: rgba(0, 51, 102, 0.05);
 }
+
+.aesth {
+  background-color: #003366;
+  color: white;
+  padding: 10px;
+  border-radius: 15px;
+  margin-bottom: 10px;
+}
