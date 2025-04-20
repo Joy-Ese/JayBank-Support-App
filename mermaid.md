@@ -60,3 +60,23 @@ sequenceDiagram
     FE->>BE: Polling For Notification
     BE->>Q: Queue Task for Notification
 ```
+
+## JayBank Support App Admin Sequence Diagram
+
+``` mermaid
+sequenceDiagram
+    participant A as Admin
+    participant FE as Frontend
+    participant BE as Backend
+    participant DB as Database
+    participant JWT as Secure Authentication
+    participant DH as Dashboard
+
+    A->>FE: Attempt Login
+    FE->>BE: Send Admin Credentials (HTTP)
+    BE->>DB: Validate Credentials
+    BE->>JWT: Authentication
+    JWT-->>BE: Get Response
+    BE->>FE: Succesful Response
+    A->>DH: View User metrics
+```
