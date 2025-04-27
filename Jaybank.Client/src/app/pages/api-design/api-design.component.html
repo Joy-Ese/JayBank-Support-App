@@ -1,7 +1,30 @@
 <div class="api-design-container mt-3">
+  <div class="row mx-2">
+    <div class="d-flex justify-content-between">
+      <div class="architectural-diagram">
+        <img 
+          ngSrc="assets/images/flowchart.png" 
+          width="600" 
+          height="400"
+          alt="JB AI Support Flow Chart Architectural Diagram"
+          priority
+        />
+      </div>
+      <div class="architectural-diagram">
+        <img 
+          ngSrc="assets/images/sequence.png" 
+          width="600" 
+          height="400"
+          alt="JB AI Support Sequence Architectural Diagram"
+          priority
+        />
+      </div>
+    </div>
+  </div>
+
   <mat-card>
     <mat-card-header>
-      <mat-card-title>AI Customer Support API Design</mat-card-title>
+      <mat-card-title>API Design</mat-card-title>
     </mat-card-header>
     
     <mat-card-content>
@@ -10,7 +33,7 @@
         <ng-container matColumnDef="method">
           <mat-header-cell *matHeaderCellDef>Method</mat-header-cell>
           <mat-cell *matCellDef="let element">
-            <mat-chip [color]="getMethodColor(element.method)">
+            <mat-chip [ngClass]="getMethodClass(element.method)">
               {{ element.method }}
             </mat-chip>
           </mat-cell>
@@ -32,7 +55,14 @@
         <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
       </mat-table>
 
-      <mat-expansion-panel *ngFor="let endpoint of apiEndpoints" class="endpoint-panel">
+      <mat-paginator 
+        [length]="apiEndpoints.length" 
+        [pageSize]="pageSize" 
+        [pageSizeOptions]="[3, 5, 10]" 
+        (page)="onPageChange($event)">
+      </mat-paginator>
+
+      <mat-expansion-panel *ngFor="let endpoint of paginatedEndpoints" class="endpoint-panel">
         <mat-expansion-panel-header>
           <mat-panel-title>
             {{ endpoint.path }}
@@ -40,10 +70,16 @@
         </mat-expansion-panel-header>
         
         <div class="endpoint-details">
-          <div class="request-body">
+          <div *ngIf="endpoint.method === 'POST' && endpoint.requestBody">
             <h3>Request Body</h3>
             <pre>{{ endpoint.requestBody | json }}</pre>
           </div>
+
+          <div *ngIf="endpoint.method === 'GET' && endpoint.queryParam">
+            <h3>Query Param</h3>
+            <pre>{{ endpoint.queryParam | json }}</pre>
+          </div>
+
           <div class="response-body">
             <h3>Response Body</h3>
             <pre>{{ endpoint.responseBody | json }}</pre>

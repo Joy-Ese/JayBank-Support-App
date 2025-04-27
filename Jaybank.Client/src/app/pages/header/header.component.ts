@@ -46,15 +46,18 @@ export class HeaderComponent implements OnInit, OnDestroy{
       this.userName = localStorage.getItem("userId");
       this.role = localStorage.getItem("role");
 
-      this.unreadNotificationsCounting();
-
-      // Subscribe to keep polling for updated notifications
-      this.startPolling();
+      if (this.token) {
+        this.unreadNotificationsCounting();
+        // Subscribe to keep polling for updated notifications
+        this.startPolling();
+      }
     }
   }
 
   // polling here to constantly fetch the number of unread notifications
   startPolling(): void {
+    if (!this.token) return; // Don't proceed if not authenticated
+
     this.pollingInterval = setInterval(() => {
       this.notificationSub = this.notificationService.getNotifications(this.page, this.limit, this.token)
       .subscribe({
