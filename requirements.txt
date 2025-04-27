@@ -19,3 +19,6 @@ sqlalchemy-utils
 pycryptodome
 stripe
 sphinx
+pytest
+pytest-asyncio
+httpx

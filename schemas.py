@@ -2,6 +2,10 @@ from pydantic import BaseModel, EmailStr, Field
 from datetime import datetime
 from enum import Enum
 
+class QueryResponse(BaseModel):
+  message: str
+  queryId: int
+
 class AllCredits(BaseModel):
   id: int
   plan: str

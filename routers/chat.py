@@ -10,7 +10,7 @@ from queue_processor import process_queue
 
 router = APIRouter()
 
-@router.post("/query", dependencies=[Depends(get_current_user)])
+@router.post("/query", response_model=schemas.QueryResponse, dependencies=[Depends(get_current_user)])
 def send_user_chat(
   query: schemas.ChatRequest, 
   background_tasks: BackgroundTasks,
@@ -26,11 +26,17 @@ def send_user_chat(
     Returns:
       dict: {"message": "Your query is in the queue for processing.", "queryId": the query Id}
 
-    Raises:
-      ValueError: If the message is empty or invalid.
+    HTTPException:
+      Bad Request: If the message is empty or invalid.
   """
 
   print(db_user)
+
+  if not query:
+    raise HTTPException(status_code=404, detail="Query not found")
+
+  if not query.user_query.strip():
+    raise HTTPException(status_code=400, detail="Query cannot be empty.")
 
   # Add user's chat to the db
   new_user_chat = models.Chat(
@@ -68,7 +74,11 @@ def send_user_chat(
   # Call process_queue asynchronously using BackgroundTasks
   background_tasks.add_task(process_queue, db, db_user, new_user_chat.id)
 
-  return {"message": "Your query is in the queue for processing.", "queryId": new_user_chat.id}
+  # return {"message": "Your query is in the queue for processing.", "queryId": new_user_chat.id}
+  return schemas.QueryResponse(
+    message="Your query is in the queue for processing.",
+    queryId=new_user_chat.id
+  )
 
 @router.get("/query/status/{query_id}")
 async def get_query_status(query_id: int, db: Session = Depends(get_db)):
