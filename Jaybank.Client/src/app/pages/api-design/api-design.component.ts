@@ -3,7 +3,7 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatExpansionModule } from '@angular/material/expansion';
-import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 
 interface ApiEndpoint {
@@ -19,7 +19,6 @@ interface ApiEndpoint {
   selector: 'app-api-design',
   imports: [
     CommonModule,
-    NgOptimizedImage,
     MatTableModule,
     MatPaginatorModule,
     MatCardModule,
@@ -136,13 +135,64 @@ export class ApiDesignComponent implements AfterViewInit{
     {
       method: 'POST',
       path: '/admin/create-admin',
-      description: '????????WE STOPPED HERE??????????????',
+      description: 'Create an Admin and assign role',
       requestBody: {
-        "user_query": "str"
+        "username": "janedoe",
+        "email": "jane.doe@example.com",
+        "role": "Admin",
       },
       responseBody: {
-        "message": "Your query is in the queue for processing.", 
-        "queryId": "int"
+        "id": 1,
+        "username": "janedoe",
+        "email": "jane.doe@example.com",
+        "role": "User"
+      }
+    },
+    {
+      method: 'GET',
+      path: '/notification/all',
+      description: 'Gets list of notifications',
+      responseBody: {
+        "data": [
+          {
+            "id": "int",
+            "user_id": "int",
+            "status": "str",
+            "message": "str",
+            "time_stamp": "datetime"
+          }
+        ],
+        "pagination": {
+          "page": "int",
+          "limit": "int",
+          "totalPages": "int",
+          "totalItems": "int"
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/credit/create-checkout-session',
+      description: 'Initialize Stripe Payment',
+      queryParam: {
+        "plan": "str"
+      },
+      responseBody: {
+        "checkout_url": "str"
+      }
+    },
+    {
+      method: 'POST',
+      path: '/credit/verify-session',
+      description: 'Create an Admin and assign role',
+      queryParam: {
+        "session_id": "str"
+      },
+      responseBody: {
+        "message": "Payment already processed",
+        "payment_status": "Paid",
+        "credits": 50,
+        "plan": "Starter"
       }
     }
   ];

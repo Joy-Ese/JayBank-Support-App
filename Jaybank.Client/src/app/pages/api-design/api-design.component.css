@@ -34,7 +34,8 @@ pre {
 }
 
 .mat-mdc-card-title {
-  color: white !important;
+  color: black !important;
+  font-weight: bold;
 }
 
 .chip-get {
@@ -62,3 +63,7 @@ pre {
   color: white;
 }
 
+.imgClass {
+  height: 300px;
+  width: 500px;
+}
