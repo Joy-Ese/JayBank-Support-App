@@ -1,5 +1,5 @@
 # For more information, please refer to https://aka.ms/vscode-docker-python
-FROM python:3-slim
+FROM python:alpine@sha256:18159b2be11db91f84b8f8f655cd860f805dbd9e49a583ddaac8ab39bf4fe1a7
 
 EXPOSE 8000
 
@@ -10,8 +10,11 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 # Install system dependencies
-RUN apt-get update && apt-get install -y \
-  libpq-dev gcc python3-dev
+RUN apk update && apk add --no-cache \
+  postgresql-dev \
+  gcc \
+  python3-dev \
+  musl-dev
 
 # Install pip requirements
 COPY requirements.txt .
@@ -26,4 +29,4 @@ RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser /
 USER appuser
 
 # During debugging, this entry point will be overridden. For more information, please refer to https://aka.ms/vscode-docker-python-debug
-CMD ["uvicorn", "--bind", "0.0.0.0:8000", "-k", "main:app"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
