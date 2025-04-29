@@ -74,7 +74,6 @@ def send_user_chat(
   # Call process_queue asynchronously using BackgroundTasks
   background_tasks.add_task(process_queue, db, db_user, new_user_chat.id)
 
-  # return {"message": "Your query is in the queue for processing.", "queryId": new_user_chat.id}
   return schemas.QueryResponse(
     message="Your query is in the queue for processing.",
     queryId=new_user_chat.id

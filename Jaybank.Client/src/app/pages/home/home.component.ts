@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { StripeService } from '../../services/stripe.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { finalize } from 'rxjs/operators';
 
 interface UserDetails {
   id: number;
@@ -32,76 +33,114 @@ export class HomeComponent implements OnInit{
   isAuthenticated: boolean = false;
   token: string | null = null;
   userDetails: UserDetails = {} as UserDetails;
+  isLoading: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     public authService: AuthService,
     public stripeService: StripeService,
-    private http: HttpClient
+    private http: HttpClient,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
     if (typeof window !== 'undefined' && localStorage) {
-      this.refreshAuth(); // ⬅️ Centralized auth refresh
+      // First load user details 
+      this.refreshAuth();
 
 
-      // Listen for session_id in query params
+      // Then check for session_id
       this.route.queryParams.subscribe(params => {
         if (params['session_id']) {
           this.sessionId = params['session_id'];
           this.verifySession();
         }
       });
+
+      // Debug log to see what data we have
+      console.log('Auth state:', { 
+        isAuthenticated: this.isAuthenticated,
+        userDetails: this.userDetails
+      });
+
     }
   }
 
-  // 🔁 Refresh auth state from localStorage
+  // Refresh auth state from localStorage
   refreshAuth(): void {
     this.isAuthenticated = this.authService.isAuthenticated();
     this.token = this.authService.getToken();
 
     const userDetailsString = localStorage.getItem('userDetails');
     if (userDetailsString) {
-      this.userDetails = JSON.parse(userDetailsString);
+      try {
+        this.userDetails = JSON.parse(userDetailsString);
+        console.log('UserDetails loaded:', this.userDetails);
+      } catch (e) {
+        console.error('Error parsing user details:', e);
+        this.userDetails = {} as UserDetails;
+      }
+    } else {
+      console.warn('No user details found in localStorage');
     }
   }
 
 
-  // ✅ Verify Stripe payment and update UI
+  // Fetch fresh user data from the API
+  fetchUserDetails(): void {
+    if (!this.token) {
+      console.warn('No token available, cannot fetch user details');
+      return;
+    }
+
+    this.isLoading = true;
+    const headers = new HttpHeaders({
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${this.token}`
+    });
+
+    this.http.get<any>(`${this.baseUrl}/user/details`, { headers: headers })
+    .pipe(
+      finalize(() => {
+        this.isLoading = false;
+        this.cdr.detectChanges(); // Force change detection
+      })
+    )
+    .subscribe({
+      next: (res) => {
+        console.log('Fetched fresh user details:', res);
+        localStorage.setItem("userDetails", JSON.stringify(res));
+        localStorage.setItem("userId", res.username);
+        this.userDetails = res;
+        this.cdr.detectChanges(); // Force change detection
+      },
+      error: (err) => {
+        console.error('Error fetching user details:', err);
+        this.toastr.error("Could not fetch user details.");
+      }
+    });
+  }
+
+
+  // Verify Stripe payment and update UI
   verifySession(): void {
     if (this.sessionId && this.token) {
+      this.isLoading = true;
+
       this.stripeService.verifySession(this.sessionId, this.token).subscribe({
         next: (response) => {
           console.log('Payment verified successfully:', response);
           if (response.payment_status === "paid") {
             this.toastr.success(`${response.message}`);
 
-            // ✅ Update localStorage with fresh user data
-            const headers = new HttpHeaders({
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${this.token}`
-            });
+            // Fetch fresh user data after payment verification
+            this.fetchUserDetails();
 
-            this.http.get<any>(`${this.baseUrl}/user/details`, {headers: headers})
-            .subscribe({
-              next: (res) => {
-                localStorage.setItem("userDetails", JSON.stringify(res));
-                localStorage.setItem("userId", res.username);
-              },
-              error: (err) => {
-                console.log(err);
-              }
-            });
-
-            // 🔁 Refresh UI without reload
-            this.refreshAuth();
-
-            // ✅ Clean session_id from the URL
+            // Clean session_id from the URL
             this.router.navigate([], {
-              queryParams: {
-                session_id: null
-              },
+              relativeTo: this.route,
+              queryParams: { session_id: null },
               queryParamsHandling: 'merge'
             });
           }
@@ -109,6 +148,7 @@ export class HomeComponent implements OnInit{
         error: (err) => {
           console.error('Error verifying payment session', err);
           this.toastr.error("Could not verify payment session.");
+          this.isLoading = false;
         }
       });
     }

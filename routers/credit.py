@@ -214,12 +214,6 @@ def verify_checkout_session(session_id: str, user: dict = Depends(get_current_us
     db.commit()
     db.refresh(notification)
 
-    # return {
-    #   "message": f"Payment verified and {db_plan.credits } credits added.",
-    #   "payment_status": session.payment_status,
-    #   "plan": db_plan.plan,
-    #   "credits_added": db_plan.credits,
-    # }
     return schemas.VerifyStripe(
       message=f"Payment verified and {db_plan.credits } credits added.",
       payment_status=session.payment_status,
