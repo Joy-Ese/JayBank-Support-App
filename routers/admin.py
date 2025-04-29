@@ -32,7 +32,7 @@ router = APIRouter()
         "id": 1,
         "username": "janedoe",
         "email": "jane.doe@example.com",
-        "role": "User"
+        "role": "Admin"
       }
     """
   )

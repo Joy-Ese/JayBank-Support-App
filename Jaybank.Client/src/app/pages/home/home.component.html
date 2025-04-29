@@ -1,8 +1,16 @@
 <div class="container mt-5">
   <div class="row">
     <div class="col-md-8 offset-md-2 text-center">
+      <!-- Loading indicator -->
+      <div *ngIf="isLoading" class="my-4">
+        <div class="spinner-border text-primary" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+        <p>Processing your payment...</p>
+      </div>
+
       <!-- Content for non-authenticated users -->
-      <div *ngIf="!isAuthenticated">
+      <div *ngIf="!isAuthenticated && !isLoading">
         <h1 class="display-4" style="color: #DB7093;">Welcome to JB AI Support</h1>
         <p class="lead">Revolutionizing Banking Support with Artificial Intelligence</p>
         
@@ -40,8 +48,15 @@
         </div>
       </div>
 
+      <!-- Debug info (remove in production) -->
+      <div *ngIf="isAuthenticated && !userDetails?.role" class="alert alert-warning">
+        <p>Authentication detected, but user role is missing.</p>
+        <p>User details: {{userDetails | json}}</p>
+        <button class="btn btn-sm btn-info" (click)="fetchUserDetails()">Refresh User Data</button>
+      </div>
+
       <!-- Content for authenticated users -->
-      <div *ngIf="isAuthenticated">
+      <div *ngIf="isAuthenticated && userDetails?.role === 'User' && !isLoading">
         <h1 class="display-4" style="color: #DB7093;">Welcome {{ userDetails.username }}</h1>
         <p class="lead">We hope you enjoy using JB AI for your virtual assistance.</p>
         
@@ -49,7 +64,7 @@
           As a way to say thank you, we have given you 20 free credits on successful registration to use JB AI. 
         </h6>
         <h6>
-          You are currently on the <span>{{ userDetails.plan_subscribed_to }}</span> plan and you have <span>{{ userDetails.credits_remaining }}</span> number of credits remaining.
+          You are currently on the <span>{{ userDetails.plan_subscribed_to || 'Free' }}</span> plan and you have <span>{{ userDetails.credits_remaining || 0 }}</span> number of credits remaining.
         </h6>
         <h6>
           You can visit our <a class="priceLink" href="/pricing">pricing</a> page to upgrage your plan and purchase more credits.
