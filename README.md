@@ -5,6 +5,7 @@ This is an AI enabled customer facing application that integrates with an AI mod
 ✔️ User Authentication (JWT-based login)\
 ✔️ Role Based Access Control (RBAC)\
 ✔️ Chat with JB AI (Integrated witrh Mistral AI)\
+✔️ Top up credits (Purchased via Stripe)\
 ✔️ Secure Data Encryption (For API requests & responses)\
 ✔️ Responsive UI (Built with Angular & Bootstrap)
 
