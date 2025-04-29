@@ -49,11 +49,11 @@
       </div>
 
       <!-- Debug info (remove in production) -->
-      <div *ngIf="isAuthenticated && !userDetails?.role" class="alert alert-warning">
+      <!-- <div *ngIf="isAuthenticated && !userDetails?.role" class="alert alert-warning">
         <p>Authentication detected, but user role is missing.</p>
         <p>User details: {{userDetails | json}}</p>
         <button class="btn btn-sm btn-info" (click)="fetchUserDetails()">Refresh User Data</button>
-      </div>
+      </div> -->
 
       <!-- Content for authenticated users -->
       <div *ngIf="isAuthenticated && userDetails?.role === 'User' && !isLoading">
