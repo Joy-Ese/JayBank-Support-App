@@ -6,7 +6,7 @@ from seed import seed_credits
 from routers import auth, chat, user, admin, credit, notification
 
 app = FastAPI(
-  title="JB Support API",
+  title="JB AI Support API",
   description="This API provides users with support about banking (financial institution) queries using AI models.",
   version="1.0.0",
   contact={"name": "Joy Eseosa Ihama", "email": "ihamajoyeseosa@gmail.com"},

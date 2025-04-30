@@ -5,7 +5,10 @@ services:
       context: ./Jaybank.Client
       dockerfile: Dockerfile
     ports:
-      - 4200:80  # Map host port 4200 to container port 80 (nginx default)
+      - 4200:4200
+    volumes:
+      - ./Jaybank.Client:/app  # For live reload (optional)
+      - /app/node_modules      # Prevents overwriting node_modules with host's
     depends_on:
       - jaybanksupportapp
     networks:
