@@ -66,7 +66,10 @@ def send_user_chat(
     db.add(new_queue_entry)
     db.commit()
     db.refresh(new_queue_entry) 
-    return {"message": "Insufficient credits. Your query is pending and has been queued."}
+    return schemas.QueryResponse(
+      message="Insufficient credits. Your query is pending and has been queued.",
+      queryId=new_user_chat.id
+    )
 
   new_queue_entry = models.Queue(user_id=db_user.id, query_id=new_user_chat.id, queries_submitted=query.user_query, status="processing")
   db.add(new_queue_entry)
