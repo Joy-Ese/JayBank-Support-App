@@ -18,7 +18,7 @@ interface ChatMessage {
   chat_from_user?: string;
   response_from_ai?: string;
   query_id?: number;
-  status?: 'pending' | 'processing' | 'completed';
+  status?: 'pending' | 'processing' | 'completed'| 'insufficient';
   time_sent?: string;
   time_responded?: string;
 }
@@ -112,7 +112,14 @@ export class ChatComponent implements OnInit{
     this.chatService.submitUserQuestion(this.newMessage, this.token).subscribe({
       next: (res) => {
         chatMessage.query_id = res.queryId;
-        this.toastr.success(`${res.message}`);
+        // this.toastr.success(`${res.message}`);
+
+        if (res.message.includes("Insufficient credits")) {
+          chatMessage.status = 'insufficient';
+          this.toastr.error(`${res.message}`);
+        } else {
+          this.toastr.success(`${res.message}`);
+        }
       },
       error: (err) => {
         this.toastr.error("Failed to submit message");

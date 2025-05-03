@@ -6,7 +6,7 @@ interface ChatMessage {
   chat_from_user?: string;
   response_from_ai?: string;
   query_id?: number;
-  status?: 'pending' | 'processing' | 'completed';
+  status?: 'pending' | 'processing' | 'completed'| 'insufficient';
   time_sent?: string;
   time_responded?: string;
 }
