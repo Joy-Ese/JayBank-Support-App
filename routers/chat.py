@@ -50,6 +50,17 @@ def send_user_chat(
 
   # Check that user's credit balance is more than 0
   if db_user.credits_remaining <= 0:
+    # Save new notification
+    notification = models.Notification(
+      user_id=db_user.id,
+      message="Insufficient credits. Please purchase more credits",
+      status="unread",
+      time_stamp=datetime.utcnow()
+    )
+    db.add(notification)
+    db.commit()
+    db.refresh(notification)
+
     # Add to user's chat request to queue if no available credits
     new_queue_entry = models.Queue(user_id=db_user.id, query_id=new_user_chat.id, queries_submitted=query.user_query, status="pending")
     db.add(new_queue_entry)
