@@ -4,7 +4,7 @@ from sqlalchemy.orm import sessionmaker
 import psycopg2
 import os
 
-# When running from local host
+# When running from local and using pgAdmin 4
 # DATABASE_URL = "postgresql://postgres:Joyeseosa@localhost:5432/JayBankDB"
 
 # When running from docker
