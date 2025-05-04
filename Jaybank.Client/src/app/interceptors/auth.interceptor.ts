@@ -20,35 +20,6 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     });
   }
 
-  // return next(req).pipe(
-  //   catchError((error) => {
-  //     // Only handle 401 errors when a user was previously logged in
-  //     if (error instanceof HttpErrorResponse && 
-  //         error.status === 401 && 
-  //         localStorage.getItem('token')) { // Only if token exists
-
-  //       // Clear local storage
-  //       if (typeof localStorage !== 'undefined') {
-  //         localStorage.removeItem("token");
-  //         localStorage.removeItem("loginResp");
-  //         localStorage.removeItem("userDetails");
-  //         localStorage.clear();
-  //       }
-
-  //       // Show only one toastr message
-  //       toastr.warning('Your session has expired. Please sign in again.', 'Session Timeout');
-
-  //       // Redirect to login page
-  //       router.navigate(['/login']);
-  //       setTimeout(() => {
-  //         window.location.reload();
-  //       }, 300);
-  //     }
-
-  //     return throwError(() => error);
-  //   })
-  // );
-
   return next(req).pipe(
     catchError((error) => {
       const currentUrl = router.url;
