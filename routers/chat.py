@@ -76,9 +76,9 @@ def send_user_chat(
   db.commit()
   db.refresh(new_queue_entry) 
 
-  # Get the database user model from the pydantic schema and deduct 1 credit per query
+  # Get the database user model from the pydantic schema and deduct 5 credits per query
   user_model = db.query(models.User).filter(models.User.id == db_user.id).first()
-  user_model.credits_remaining -= 1
+  user_model.credits_remaining -= 5
   db.commit()
   db.refresh(user_model) 
 

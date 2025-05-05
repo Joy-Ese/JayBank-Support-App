@@ -72,6 +72,7 @@ export class HomeComponent implements OnInit{
     this.isAuthenticated = this.authService.isAuthenticated();
     this.token = this.authService.getToken();
 
+    this.fetchUserDetails();
     const userDetailsString = localStorage.getItem('userDetails');
     if (userDetailsString) {
       try {
